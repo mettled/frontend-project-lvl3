@@ -1,6 +1,6 @@
-[![Maintainability](https://api.codeclimate.com/v1/badges/4f366c1ddee9aee0929b/maintainability)](https://codeclimate.com/github/mettled/frontend-project-lvl2/maintainability)  
+[![Maintainability](https://api.codeclimate.com/v1/badges/f6f86a1cfd13d42fb08e/maintainability)](https://codeclimate.com/github/mettled/frontend-project-lvl3/maintainability)
 
-[![Build Status](https://travis-ci.org/mettled/frontend-project-lvl1.svg?branch=master)](https://travis-ci.org/mettled/frontend-project-lvl1)  
+![rss_reader](https://github.com/mettled/frontend-project-lvl3/workflows/rss_reader/badge.svg) 
 
 ## About app
 

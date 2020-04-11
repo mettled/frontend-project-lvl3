@@ -13,7 +13,7 @@ const stateApp = new State({
   error: '',
   isValid: null,
   feeds: [],
-  news: [],
+  news: [ {feedId: 3, title: "Coronavirus: The UK's Easter lockdown from above", description: "Many areas in the UK seem to be following the gove…advice, with relatively empty beaches and parks .", link: "https://www.bbc.co.uk/news/uk-52249942"} ],
 });
 
 // http://lorem-rss.herokuapp.com/feed
@@ -25,20 +25,27 @@ const findLink = (checkFeed, starageParam) => (
   Array.from(starageParam).find(({ link }) => link === checkFeed)
 );
 
-const controlFeedContent = (data, state) => {
+const undateStateContent = (data, state) => {
   data.forEach((content) => {
-    const { feed, items, link } = content;
-    const findedFeed = findLink(link, state.getState('feeds'));
-    const uniqFeedID = findedFeed ? findedFeed.id : undefined;
-    if (!uniqFeedID) {
-      const unuqID = uniqueId();
-      const itemsWithID = items.map((item) => ({ feedId: uniqFeedID, item }));
-      state.setState({
-        feeds: [{ id: unuqID, contentFeed: feed, link }],
-        news: itemsWithID,
-      });
-    } else {
-      const itemsWithID = items.map((item) => ({ feedId: uniqFeedID, item }));
+    const { feed: {
+      title: feedTitle, description: feedDescription, link: feedLink,
+    }, items } = content;
+
+    const findedFeed = findLink(feedLink, state.getState('feeds'));
+    const uniqID = !findedFeed ? uniqueId() : findedFeed.id;
+
+    if (!findedFeed) {
+      state.setState({ feeds: [{
+        id: uniqID,
+        title: feedTitle,
+        description: feedDescription,
+        link: feedLink,
+      }] });
+    }
+
+    const filteredItems = items.filter(({ link }) => (!findLink(link, state.getState('news'))));
+    const itemsWithID = filteredItems.map(( { title, description, link } ) => ( { feedId: uniqID, title, description, link } ));
+    if (itemsWithID.length > 0) {
       state.setState({ news: itemsWithID });
     }
   });
@@ -46,12 +53,12 @@ const controlFeedContent = (data, state) => {
 
 const getContent = (links, periodRequest = false) => {
   const requestLinks = !periodRequest ? [links] : stateApp.getState('feeds').map(({ link }) => link);
+  console.log('requestLinks', requestLinks)
   request(requestLinks)
     .then((data) => {
-      const newState = periodRequest ? { news: [] } : { action: 'feedWasAdded', error: '' };
-      stateApp.setState(newState);
-
-      controlFeedContent(data, stateApp);
+      undateStateContent(data, stateApp);
+      // const newState = periodRequest ? { news: [] } : { action: 'feedWasAdded', error: '' };
+      stateApp.setState({ action: 'feedWasAdded' });
     })
     .catch((e) => {
       stateApp.setState({ action: 'errorNetwork', error: e.message });
@@ -63,6 +70,7 @@ const getContent = (links, periodRequest = false) => {
       } else {
         clearTimeout(timerID);
       }
+      console.log('repeat', stateApp.getState('news'))
     });
 };
 
@@ -91,6 +99,7 @@ const onContentSubmit = (event) => {
     stateApp.setState({ action: 'chanelExist' });
     return;
   }
+  clearTimeout(timerID);
   getContent(link, false);
 };
 

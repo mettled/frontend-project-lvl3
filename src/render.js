@@ -19,6 +19,7 @@ export const renderInputState = (state) => {
     action, error,
   } = state;
   if (error) {
+
     elements.getElementRssChanel.classList.remove('is-valid');
     elements.getElementRssChanel.classList.add('is-invalid');
 
@@ -37,16 +38,13 @@ export const renderInputState = (state) => {
 
   elements.getElementMessage.innerHTML = `${i18next.t(`state.${action}`)}`;
 
-  // if (action !== i18next.t(`state.${action}`)) {
-  //   return;
-  // }
 };
 
 export const renderFeeds = (state) => {
   const { feeds } = state;
 
   const liFeeds = feeds.reduce((acc, feed) => {
-    const { contentFeed: { description, link } } = feed;
+    const { title, description, link  } = feed;
     const li = document.createElement('li');
     li.classList.add('list-group-item');
     const a = document.createElement('a');
@@ -63,8 +61,8 @@ export const renderFeeds = (state) => {
 export const renderNews = (state) => {
   const { news } = state;
 
-  const liNews = news.reduce((acc, item) => {
-    const { item: { description, link } } = item;
+  const liNews = news.reduce((acc, {  title, description, link }) => {
+
     const li = document.createElement('li');
     li.classList.add('list-group-item');
     const a = document.createElement('a');

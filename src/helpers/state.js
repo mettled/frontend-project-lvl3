@@ -13,6 +13,7 @@ export default class State {
       }
       if (Array.isArray(this.state[key])) {
         if (fields[key].length === 0) {
+          console.log('setState', fields, key)
           this.state[key].length = 0;
         } else {
           this.state[key].push(...fields[key]);
