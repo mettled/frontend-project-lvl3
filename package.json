@@ -1,5 +1,5 @@
 {
-  "name": "frontend-project-lvl3",
+  "name": "mettled_rss_reader",
   "version": "1.0.0",
   "description": "third progect by js from hexlet courses",
   "main": "index.js",
@@ -27,14 +27,26 @@
     "@babel/preset-env": "^7.9.0",
     "babel-eslint": "^10.1.0",
     "babel-loader": "^8.1.0",
+    "css-loader": "^3.5.0",
     "eslint": "^6.8.0",
     "eslint-config-airbnb-base": "^14.1.0",
     "eslint-plugin-babel": "^5.3.0",
     "eslint-plugin-import": "^2.20.2",
+    "html-webpack-plugin": "^4.0.4",
     "make": "^0.8.1",
+    "style-loader": "^1.1.3",
     "webpack": "^4.42.1",
     "webpack-cli": "^3.3.11",
     "webpack-dev-server": "^3.10.3"
   },
-  "dependencies": {}
+  "dependencies": {
+    "axios": "^0.19.2",
+    "bootstrap": "^4.4.1",
+    "i18next": "^19.4.0",
+    "jquery": "^3.4.1",
+    "lodash": "^4.17.15",
+    "melanke-watchjs": "^1.5.2",
+    "popper.js": "^1.16.1",
+    "yup": "^0.28.3"
+  }
 }

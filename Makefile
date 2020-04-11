@@ -9,3 +9,6 @@ lint:
 
 dev:
 	npx webpack
+
+watch:
+	npx webpack --watch
