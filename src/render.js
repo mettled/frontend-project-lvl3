@@ -37,9 +37,9 @@ export const renderInputState = (state) => {
 
   elements.getElementMessage.innerHTML = `${i18next.t(`state.${action}`)}`;
 
-  if (action !== i18next.t(`state.${action}`)) {
-    return;
-  }
+  // if (action !== i18next.t(`state.${action}`)) {
+  //   return;
+  // }
 };
 
 export const renderFeeds = (state) => {
