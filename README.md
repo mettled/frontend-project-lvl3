@@ -5,6 +5,7 @@
 ## About app
 
 RSS READER
+[https://rssreader.now.sh](https://rssreader.now.sh)
 
 ## How to install
 

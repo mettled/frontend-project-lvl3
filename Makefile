@@ -8,7 +8,13 @@ lint:
 	npx eslint .
 
 dev:
-	npx webpack
+	NODE_ENV=development npx webpack --mode development
+
+open:
+	NODE_ENV=development npx webpack --mode development --open
+
+build:
+	NODE_ENV=production npx webpack --mode production
 
 watch:
 	npx webpack --watch

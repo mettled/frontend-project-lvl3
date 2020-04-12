@@ -14,19 +14,20 @@ const elements = {
   getElementMessage: document.querySelector('[id="rssMessage"]'),
 };
 
+const getstateValidation = (isValid) => i18next.t(isValid ? 'valid' : 'invalid');
+
 export const renderInputState = (state) => {
   const {
-    action, error,
+    isValid, action, error,
   } = state;
   if (error) {
-
     elements.getElementRssChanel.classList.remove('is-valid');
     elements.getElementRssChanel.classList.add('is-invalid');
 
     elements.getElementMessage.classList.remove('valid-feedback');
     elements.getElementMessage.classList.add('invalid-feedback');
 
-    elements.getElementMessage.innerHTML = `${i18next.t(`state.${action}`)}: ${error}`;
+    elements.getElementMessage.innerHTML = `${i18next.t(`state.${action}`, { validation: getstateValidation(isValid) })}: ${error}`;
     return;
   }
 
@@ -36,15 +37,14 @@ export const renderInputState = (state) => {
   elements.getElementMessage.classList.remove('invalid-feedback');
   elements.getElementMessage.classList.add('valid-feedback');
 
-  elements.getElementMessage.innerHTML = `${i18next.t(`state.${action}`)}`;
-
+  elements.getElementMessage.innerHTML = `${i18next.t(`state.${action}`, { validation: getstateValidation(isValid) })}`;
 };
 
 export const renderFeeds = (state) => {
   const { feeds } = state;
 
   const liFeeds = feeds.reduce((acc, feed) => {
-    const { title, description, link  } = feed;
+    const { description, link } = feed;
     const li = document.createElement('li');
     li.classList.add('list-group-item');
     const a = document.createElement('a');
@@ -61,8 +61,7 @@ export const renderFeeds = (state) => {
 export const renderNews = (state) => {
   const { news } = state;
 
-  const liNews = news.reduce((acc, {  title, description, link }) => {
-
+  const liNews = news.reduce((acc, { description, link }) => {
     const li = document.createElement('li');
     li.classList.add('list-group-item');
     const a = document.createElement('a');
