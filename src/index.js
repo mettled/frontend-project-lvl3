@@ -42,12 +42,13 @@ const undateStateContent = (data, state) => {
     }
 
     const filteredItems = items.filter(({ link }) => (!findLink(link, state.getState('news'))));
+    if (!filteredItems.length) {
+      return;
+    }
     const itemsWithID = filteredItems.map(({ title, description, link }) => ({
       feedId: uniqID, title, description, link,
     }));
-    if (itemsWithID.length > 0) {
-      state.setState({ news: itemsWithID });
-    }
+    state.setState({ news: itemsWithID });
   });
 };
 
