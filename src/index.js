@@ -69,7 +69,7 @@ const getContent = (links, periodRequest = false) => {
 const onContentInput = (event) => {
   const { value: url } = event.target;
   if (url.length > 0) {
-    const validationResult =  validate(url);
+    const validationResult = validate(url);
     const errorMesage = validationResult ? '' : 'Enter correct RSS chanel';
     stateApp.setState({ isValid: validationResult, action: 'checkValid', error: errorMesage });
     return;

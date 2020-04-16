@@ -2,7 +2,7 @@ import { object, string } from 'yup';
 
 const scemaOfValidation = {
   value: string()
-    .url()
+    .url(),
 };
 
 export default (value) => (
