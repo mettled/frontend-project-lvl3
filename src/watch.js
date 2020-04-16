@@ -1,9 +1,9 @@
 import { watch } from 'melanke-watchjs';
-import { renderInputState, renderFeeds, renderNews } from './render';
+import { renderControls, renderFeeds, renderNews } from './render';
 
 export default (state) => {
   watch(state, ['isValid', 'error', 'action'], () => {
-    renderInputState(state);
+    renderControls(state);
   });
 
   watch(state, 'feeds', () => {

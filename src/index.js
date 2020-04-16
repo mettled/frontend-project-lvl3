@@ -57,40 +57,30 @@ const getContent = (links, periodRequest = false) => {
   request(requestLinks)
     .then((data) => {
       undateStateContent(data, stateApp);
-      if (!periodRequest) {
-        stateApp.setState({ action: 'feedWasAdded' });
-      }
     })
     .catch((e) => {
       stateApp.setState({ action: 'errorNetwork', error: e.message });
     })
     .finally(() => {
-      if (!stateApp.getState('error')) {
-        timerID = setTimeout(getContent, PERIOD_REQUEST, [], true);
-      } else {
-        clearTimeout(timerID);
-      }
+      timerID = setTimeout(getContent, PERIOD_REQUEST, [], true);
     });
 };
 
 const onContentInput = (event) => {
   const { value: url } = event.target;
-  try {
-    const { error: errorValidation } = validate(url);
-    if (errorValidation) {
-      throw new Error(errorValidation);
-    }
-    stateApp.setState({ isValid: true, action: 'checkValid', error: '' });
-  } catch (e) {
-    stateApp.setState({ isValid: false, action: 'checkValid', error: e.message });
+  if (url.length > 0) {
+    const validationResult =  validate(url);
+    const errorMesage = validationResult ? '' : 'Enter correct RSS chanel';
+    stateApp.setState({ isValid: validationResult, action: 'checkValid', error: errorMesage });
+    return;
   }
+  stateApp.setState({ isValid: false, action: 'waitEnter', error: '' });
 };
 
 const onContentSubmit = (event) => {
   event.preventDefault();
   const form = new FormData(event.target);
   const link = form.get('url');
-
   if (!stateApp.getState('isValid')) {
     return;
   }
@@ -99,6 +89,7 @@ const onContentSubmit = (event) => {
     return;
   }
   clearTimeout(timerID);
+  stateApp.setState({ action: 'feedWasAdded' });
   getContent(link, false);
 };
 
