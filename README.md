@@ -7,12 +7,6 @@
 RSS READER
 [https://rssreader.now.sh](https://rssreader.now.sh)
 
-## How to install
-
-To install util you must type
-``
-npm i mettled_rss_reader
-``
 
 # How to install enviroment
 
