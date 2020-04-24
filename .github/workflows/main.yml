@@ -36,8 +36,8 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       # Steps represent a sequence of tasks that will be executed as part of the job
-      - name: Run install
+      - name: Start installing
         run: make install
         
-      - name: run lint
+      - name: start linting
         run: make lint
