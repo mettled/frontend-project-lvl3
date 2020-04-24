@@ -60,6 +60,7 @@ const undateStateContent = (data) => {
     const uniqID = findedSource ? findedSource.id : uniqueId();
 
     if (!findedSource) {
+      state.addSource();
       state.sources.push({
         id: uniqID,
         title: sourceTitle,
@@ -83,7 +84,6 @@ const addContent = (links, periodRequest = false) => {
   const requestLinks = !periodRequest ? [links] : state.sources.map(({ link }) => link);
   getContent(requestLinks)
     .then((data) => {
-      state.addSource();
       undateStateContent(data);
     })
     .catch(() => {
