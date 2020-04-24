@@ -1,54 +1,41 @@
 import i18next from 'i18next';
-import resources from './locales';
-
-i18next.init({
-  lng: 'en',
-  debug: true,
-  resources,
-});
 
 const elements = {
-  getElementInput: document.querySelector('[id="rssChanel"] input'),
-  getElementButton: document.querySelector('[id="rssChanel"] button[type="submit"]'),
-  getElementFeeds: document.querySelector('[id="feeds"]'),
-  getElementNews: document.querySelector('[id="news"]'),
-  getElementMessage: document.querySelector('[id="rssMessage"]'),
+  getElementForm: () => document.querySelector('[id="rssChanel"]'),
+  getElementInput: () => elements.getElementForm().querySelector('[name="url"]'),
+  getElementButton: () => elements.getElementForm().querySelector('[name="submit"]'),
+  getElementMessage: () => elements.getElementForm().querySelector('[name="message"]'),
+  getElementSources: () => document.querySelector('[id="sources"]'),
+  getElementArticles: () => document.querySelector('[id="articles"]'),
 };
-
-const getStateValidation = (isValid) => i18next.t(isValid ? 'valid' : 'invalid');
 
 export const renderControls = (state) => {
   const {
-    isValid, action, error,
+    action, error, disable,
   } = state;
+
+  elements.getElementButton().disabled = disable;
   if (error) {
-    elements.getElementInput.classList.remove('is-valid');
-    elements.getElementInput.classList.add('is-invalid');
-    elements.getElementButton.disabled = true;
-    elements.getElementMessage.classList.remove('valid-feedback');
-    elements.getElementMessage.classList.add('invalid-feedback');
+    elements.getElementMessage().innerHTML = `${i18next.t(`errors.${error}`)}`;
 
-    elements.getElementMessage.innerHTML = `${i18next.t(`state.${action}`, { validation: getStateValidation(isValid) })} ${error}`;
-    return;
-  }
-  if (action === 'feedWasAdded' || action === 'waitEnter') {
-    elements.getElementButton.disabled = true;
+    elements.getElementInput().classList.remove('is-valid');
+    elements.getElementInput().classList.add('is-invalid');
+    elements.getElementMessage().classList.remove('valid-feedback');
+    elements.getElementMessage().classList.add('invalid-feedback');
   } else {
-    elements.getElementButton.disabled = false;
-  }
-  elements.getElementInput.classList.remove('is-invalid');
-  elements.getElementInput.classList.add('is-valid');
+    elements.getElementMessage().innerHTML = `${i18next.t(`state.${action}`)}`;
 
-  elements.getElementMessage.classList.remove('invalid-feedback');
-  elements.getElementMessage.classList.add('valid-feedback');
-  elements.getElementMessage.innerHTML = `${i18next.t(`state.${action}`, { validation: getStateValidation(isValid) })}`;
+    elements.getElementInput().classList.remove('is-invalid');
+    elements.getElementInput().classList.add('is-valid');
+    elements.getElementMessage().classList.remove('invalid-feedback');
+    elements.getElementMessage().classList.add('valid-feedback');
+  }
 };
 
-export const renderFeeds = (state) => {
-  elements.getElementButton.disabled = true;
-  const { feeds } = state;
+export const renderSources = (state) => {
+  const { sources, disable, activeLink } = state;
 
-  const liFeeds = feeds.reduce((acc, feed) => {
+  const liSources = sources.map((feed) => {
     const { description, link } = feed;
     const li = document.createElement('li');
     li.classList.add('list-group-item');
@@ -56,27 +43,26 @@ export const renderFeeds = (state) => {
     a.innerHTML = description;
     a.href = link;
     li.append(a);
-    return [...acc, li];
-  }, []);
-  elements.getElementFeeds.innerHTML = '';
-  elements.getElementFeeds.append(...liFeeds);
-  elements.getElementInput.value = '';
-  elements.getElementButton.disabled = false;
+    return li;
+  });
+  elements.getElementSources().innerHTML = '';
+  elements.getElementSources().append(...liSources);
+  elements.getElementInput().value = activeLink;
+  elements.getElementButton().disabled = disable;
 };
 
-export const renderNews = (state) => {
-  const { news } = state;
-
-  const liNews = news.reduce((acc, { description, link }) => {
+export const renderArticles = (state) => {
+  const { articles, disable } = state;
+  const liArticles = articles.map(({ description, link }) => {
     const li = document.createElement('li');
     li.classList.add('list-group-item');
     const a = document.createElement('a');
     a.innerHTML = description;
     a.href = link;
     li.append(a);
-    return [...acc, li];
-  }, []);
-  elements.getElementNews.innerHTML = '';
-  elements.getElementNews.append(...liNews);
-  elements.getElementButton.disabled = false;
+    return li;
+  });
+  elements.getElementArticles().innerHTML = '';
+  elements.getElementArticles().append(...liArticles);
+  elements.getElementButton().disabled = disable;
 };

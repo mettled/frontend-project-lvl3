@@ -4,8 +4,7 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 
-const isDev = process.env.NODE_ENV === 'development';
-
+const isDev = process.env.NODE_ENV === 'development' || true;
 module.exports = {
   mode: 'development',
   entry: {
@@ -16,7 +15,7 @@ module.exports = {
       chunks: 'all',
     },
   },
-  devtool: isDev ? 'eval' : '',
+  devtool: isDev ? '' : 'eval',
   output: {
     filename: '[name].js',
     path: path.resolve(__dirname, 'dist'),

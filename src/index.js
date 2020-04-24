@@ -1,99 +1,123 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import uniqueId from 'lodash/uniqueId';
+import i18next from 'i18next';
 import watch from './watch';
-import request from './request';
-import State from './helpers/state';
+import resources from './locales';
+import getContent from './getContent';
 import validate from './validate';
 
 const PERIOD_REQUEST = 5000;
 let timerID;
 
-const stateApp = new State({
-  action: '',
-  error: '',
-  isValid: null,
-  feeds: [],
-  news: [],
+i18next.init({
+  lng: 'en',
+  debug: true,
+  resources,
 });
 
-const findLink = (checkFeed, starageParam) => (
-  Array.from(starageParam).find(({ link }) => link === checkFeed)
+const state = {
+  activeLink: '',
+  action: '',
+  error: '',
+  disable: true,
+  sources: [],
+  articles: [],
+  wait() {
+    this.disable = true;
+    this.action = 'wait';
+    this.error = '';
+  },
+  addSource() {
+    this.action = 'added';
+    this.disable = true;
+    this.activeLink = '';
+  },
+  setValidation() {
+    this.disable = false;
+    this.action = 'validation';
+    this.error = '';
+  },
+  setError(error) {
+    this.disable = true;
+    this.action = '';
+    this.error = error;
+  },
+};
+
+const findLink = (checkLink, storage) => (
+  Array.from(storage).find(({ link }) => link === checkLink)
 );
 
-const undateStateContent = (data, state) => {
+const undateStateContent = (data) => {
   data.forEach((content) => {
     const {
-      feed: {
-        title: feedTitle, description: feedDescription, link: feedLink,
-      }, items,
+      source: {
+        title: sourceTitle, description: sourceDescription, link: sourceLink,
+      }, articles,
     } = content;
-    const findedFeed = findLink(feedLink, state.getState('feeds'));
-    const uniqID = !findedFeed ? uniqueId() : findedFeed.id;
 
-    if (!findedFeed) {
-      state.setState({
-        feeds: [{
-          id: uniqID,
-          title: feedTitle,
-          description: feedDescription,
-          link: feedLink,
-        }],
+    const findedSource = findLink(sourceLink, state.sources);
+    const uniqID = findedSource ? findedSource.id : uniqueId();
+
+    if (!findedSource) {
+      state.sources.push({
+        id: uniqID,
+        title: sourceTitle,
+        description: sourceDescription,
+        link: sourceLink,
       });
     }
 
-    const filteredItems = items.filter(({ link }) => (!findLink(link, state.getState('news'))));
-    if (!filteredItems.length) {
+    const newArticles = articles.filter(({ link }) => (!findLink(link, state.articles)));
+    if (newArticles.length === 0) {
       return;
     }
-    const itemsWithID = filteredItems.map(({ title, description, link }) => ({
-      feedId: uniqID, title, description, link,
+    const articlesWithID = newArticles.map(({ title, description, link }) => ({
+      sourceId: uniqID, title, description, link,
     }));
-    state.setState({ news: itemsWithID });
+    state.articles.push(...articlesWithID);
   });
 };
 
-const getContent = (links, periodRequest = false) => {
-  const requestLinks = !periodRequest ? [links] : stateApp.getState('feeds').map(({ link }) => link);
-  request(requestLinks)
+const addContent = (links, periodRequest = false) => {
+  const requestLinks = !periodRequest ? [links] : state.sources.map(({ link }) => link);
+  getContent(requestLinks)
     .then((data) => {
-      undateStateContent(data, stateApp);
+      state.addSource();
+      undateStateContent(data);
     })
-    .catch((e) => {
-      stateApp.setState({ action: 'errorNetwork', error: e.message });
+    .catch(() => {
+      state.setError('networkError');
     })
     .finally(() => {
-      timerID = setTimeout(getContent, PERIOD_REQUEST, [], true);
+      timerID = setTimeout(addContent, PERIOD_REQUEST, [], true);
     });
 };
 
 const onContentInput = (event) => {
-  const { value: url } = event.target;
-  if (url.length > 0) {
-    const validationResult = validate(url);
-    const errorMesage = validationResult ? '' : 'Enter correct RSS chanel';
-    stateApp.setState({ isValid: validationResult, action: 'checkValid', error: errorMesage });
+  state.activeLink = event.target.value;
+  if (state.activeLink.length === 0) {
+    state.wait();
     return;
   }
-  stateApp.setState({ isValid: false, action: 'waitEnter', error: '' });
+
+  if (validate(state.activeLink, state.sources)) {
+    state.setValidation();
+    return;
+  }
+  state.setError('linkError');
 };
 
 const onContentSubmit = (event) => {
   event.preventDefault();
   const form = new FormData(event.target);
   const link = form.get('url');
-  if (!stateApp.getState('isValid')) {
-    return;
-  }
-  if (findLink(link, stateApp.getState('feeds'))) {
-    stateApp.setState({ action: 'chanelExist' });
-    return;
-  }
+
   clearTimeout(timerID);
-  stateApp.setState({ action: 'feedWasAdded' });
-  getContent(link, false);
+  addContent(link, false);
 };
 
-watch(stateApp.getState());
+watch(state);
 
 document.querySelector('#rssChanel input')
   .addEventListener('input', onContentInput);

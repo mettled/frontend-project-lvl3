@@ -1,13 +1,13 @@
 export default {
   translation: {
-    valid: 'valid',
-    invalid: 'invalid',
+    errors: {
+      networkError: 'Check network connection',
+      linkError: 'Enter correct rss link',
+    },
     state: {
-      waitEnter: 'Please enter url of a RSS chanel',
-      checkValid: 'Entered chanel is {{ validation }}',
-      chanelExist: 'Enter another rss chanel',
-      feedWasAdded: 'Chanel was added',
-      errorNetwork: 'Request Error',
+      wait: '',
+      validation: 'Entered chanel is valid',
+      added: 'Chanel was added',
     },
   },
 };
