@@ -22,33 +22,13 @@ const state = {
   disable: true,
   sources: [],
   articles: [],
-  wait() {
-    this.disable = true;
-    this.action = 'wait';
-    this.error = '';
-  },
-  addSource() {
-    this.action = 'added';
-    this.disable = true;
-    this.activeLink = '';
-  },
-  setValidation() {
-    this.disable = false;
-    this.action = 'validation';
-    this.error = '';
-  },
-  setError(error) {
-    this.disable = true;
-    this.action = '';
-    this.error = error;
-  },
 };
 
 const findLink = (checkLink, storage) => (
   Array.from(storage).find(({ link }) => link === checkLink)
 );
 
-const undateStateContent = (data) => {
+const addStateContent = (data) => {
   data.forEach((content) => {
     const {
       source: {
@@ -60,7 +40,9 @@ const undateStateContent = (data) => {
     const uniqID = findedSource ? findedSource.id : uniqueId();
 
     if (!findedSource) {
-      state.addSource();
+      state.action = 'added';
+      state.disable = true;
+      state.activeLink = '';
       state.sources.push({
         id: uniqID,
         title: sourceTitle,
@@ -84,10 +66,12 @@ const addContent = (links, periodRequest = false) => {
   const requestLinks = !periodRequest ? [links] : state.sources.map(({ link }) => link);
   getContent(requestLinks)
     .then((data) => {
-      undateStateContent(data);
+      addStateContent(data);
     })
     .catch(() => {
-      state.setError('networkError');
+      state.disable = true;
+      state.action = '';
+      state.error = 'networkError';
     })
     .finally(() => {
       timerID = setTimeout(addContent, PERIOD_REQUEST, [], true);
@@ -97,15 +81,21 @@ const addContent = (links, periodRequest = false) => {
 const onContentInput = (event) => {
   state.activeLink = event.target.value;
   if (state.activeLink.length === 0) {
-    state.wait();
+    state.disable = true;
+    state.action = 'wait';
+    state.error = '';
     return;
   }
 
   if (validate(state.activeLink, state.sources)) {
-    state.setValidation();
+    state.disable = false;
+    state.action = 'validation';
+    state.error = '';
     return;
   }
-  state.setError('linkError');
+  state.disable = true;
+  state.action = '';
+  state.error = 'linkError';
 };
 
 const onContentSubmit = (event) => {

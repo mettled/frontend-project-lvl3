@@ -1,12 +1,12 @@
 import i18next from 'i18next';
 
 const elements = {
-  getElementForm: () => document.querySelector('[id="rssChanel"]'),
+  getElementForm: () => document.querySelector('#rssChanel'),
   getElementInput: () => elements.getElementForm().querySelector('[name="url"]'),
   getElementButton: () => elements.getElementForm().querySelector('[name="submit"]'),
   getElementMessage: () => elements.getElementForm().querySelector('[name="message"]'),
-  getElementSources: () => document.querySelector('[id="sources"]'),
-  getElementArticles: () => document.querySelector('[id="articles"]'),
+  getElementSources: () => document.querySelector('#sources'),
+  getElementArticles: () => document.querySelector('#articles'),
 };
 
 export const renderControls = (state) => {
