@@ -16,19 +16,18 @@ i18next.init({
 });
 
 const state = {
-  activeLink: '',
-  action: '',
+  status: 'empty',
   error: '',
-  disable: true,
   sources: [],
   articles: [],
+  input: '',
 };
 
 const findLink = (checkLink, storage) => (
   Array.from(storage).find(({ link }) => link === checkLink)
 );
 
-const addStateContent = (data) => {
+const addContentToState = (data) => {
   data.forEach((content) => {
     const {
       source: {
@@ -40,9 +39,7 @@ const addStateContent = (data) => {
     const uniqID = findedSource ? findedSource.id : uniqueId();
 
     if (!findedSource) {
-      state.action = 'added';
-      state.disable = true;
-      state.activeLink = '';
+      state.status = 'added';
       state.sources.push({
         id: uniqID,
         title: sourceTitle,
@@ -66,11 +63,10 @@ const addContent = (links, periodRequest = false) => {
   const requestLinks = !periodRequest ? [links] : state.sources.map(({ link }) => link);
   getContent(requestLinks)
     .then((data) => {
-      addStateContent(data);
+      addContentToState(data);
+      state.error = '';
     })
     .catch(() => {
-      state.disable = true;
-      state.action = '';
       state.error = 'networkError';
     })
     .finally(() => {
@@ -79,23 +75,13 @@ const addContent = (links, periodRequest = false) => {
 };
 
 const onContentInput = (event) => {
-  state.activeLink = event.target.value;
-  if (state.activeLink.length === 0) {
-    state.disable = true;
-    state.action = 'wait';
-    state.error = '';
+  const link = event.target.value;
+  if (link.length === 0) {
+    state.status = 'empty';
     return;
   }
-
-  if (validate(state.activeLink, state.sources)) {
-    state.disable = false;
-    state.action = 'validation';
-    state.error = '';
-    return;
-  }
-  state.disable = true;
-  state.action = '';
-  state.error = 'linkError';
+  const { resultValidation } = validate(link, state.sources);
+  state.status = resultValidation;
 };
 
 const onContentSubmit = (event) => {

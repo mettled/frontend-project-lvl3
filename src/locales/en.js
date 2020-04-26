@@ -2,11 +2,12 @@ export default {
   translation: {
     errors: {
       networkError: 'Check network connection',
-      linkError: 'Enter correct rss link',
     },
-    state: {
-      wait: '',
-      validation: 'Entered chanel is valid',
+    status: {
+      empty: '',
+      valid: 'Entered chanel is valid',
+      incorrectLink: 'Please enter correct link',
+      dublicateLink: 'Please enter another link, it was already added',
       added: 'Chanel was added',
     },
   },

@@ -9,12 +9,15 @@ const elements = {
   getElementArticles: () => document.querySelector('#articles'),
 };
 
-export const renderControls = (state) => {
+export const renderForm = (state) => {
   const {
-    action, error, disable,
+    status, error, input,
   } = state;
 
-  elements.getElementButton().disabled = disable;
+  if (status === 'added') {
+    elements.getElementInput().value = input;
+  }
+  elements.getElementButton().disabled = status !== 'valid' || error;
   if (error) {
     elements.getElementMessage().innerHTML = `${i18next.t(`errors.${error}`)}`;
 
@@ -23,7 +26,7 @@ export const renderControls = (state) => {
     elements.getElementMessage().classList.remove('valid-feedback');
     elements.getElementMessage().classList.add('invalid-feedback');
   } else {
-    elements.getElementMessage().innerHTML = `${i18next.t(`state.${action}`)}`;
+    elements.getElementMessage().innerHTML = `${i18next.t(`status.${status}`)}`;
 
     elements.getElementInput().classList.remove('is-invalid');
     elements.getElementInput().classList.add('is-valid');
@@ -33,7 +36,7 @@ export const renderControls = (state) => {
 };
 
 export const renderSources = (state) => {
-  const { sources, disable, activeLink } = state;
+  const { sources } = state;
 
   const liSources = sources.map((feed) => {
     const { description, link } = feed;
@@ -47,12 +50,10 @@ export const renderSources = (state) => {
   });
   elements.getElementSources().innerHTML = '';
   elements.getElementSources().append(...liSources);
-  elements.getElementInput().value = activeLink;
-  elements.getElementButton().disabled = disable;
 };
 
 export const renderArticles = (state) => {
-  const { articles, disable } = state;
+  const { articles } = state;
   const liArticles = articles.map(({ description, link }) => {
     const li = document.createElement('li');
     li.classList.add('list-group-item');
@@ -64,5 +65,4 @@ export const renderArticles = (state) => {
   });
   elements.getElementArticles().innerHTML = '';
   elements.getElementArticles().append(...liArticles);
-  elements.getElementButton().disabled = disable;
 };
