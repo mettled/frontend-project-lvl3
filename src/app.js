@@ -3,7 +3,7 @@ import watch from './watch';
 import localization from './localization';
 import getContent from './getContent';
 import validate from './validate';
-import initialState from './initialState';
+import initialization from './initialization';
 
 const PERIOD_REQUEST = 5000;
 let timerID;
@@ -13,7 +13,7 @@ const findLink = (checkLink, storage) => (
 );
 
 export default () => {
-  const state = initialState();
+  const state = initialization();
   localization();
   watch(state);
 
