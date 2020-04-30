@@ -1,9 +1,9 @@
 import uniqueId from 'lodash/uniqueId';
 import watch from './watch';
-import localization from './localization';
+import setInitLocalization from './localization';
 import getContent from './getContent';
 import validate from './validate';
-import initialization from './initialization';
+import setDefaultState from './setDefaultState';
 
 const PERIOD_REQUEST = 5000;
 let timerID;
@@ -13,8 +13,8 @@ const findLink = (checkLink, storage) => (
 );
 
 export default () => {
-  const state = initialization();
-  localization();
+  const state = setDefaultState();
+  setInitLocalization();
   watch(state);
 
   const addContentToState = (data) => {
