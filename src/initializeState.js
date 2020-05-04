@@ -1,6 +1,6 @@
 export default () => ({
   status: 'empty',
-  error: '',
+  error: null,
   sources: [],
   articles: [],
   input: '',

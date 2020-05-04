@@ -1,18 +1,18 @@
 
-const parseElement = (element) => ({
+const parseNews = (element) => ({
   title: element.querySelector('title').textContent,
   description: element.querySelector('description').textContent,
   link: element.querySelector('link').textContent,
 });
 
 export default (content) => {
-  const parseredData = new DOMParser().parseFromString(content, 'text/xml');
+  const parsedData = new DOMParser().parseFromString(content, 'text/xml');
   const source = {
-    title: parseredData.querySelector('title').textContent,
-    description: parseredData.querySelector('description').textContent,
+    title: parsedData.querySelector('title').textContent,
+    description: parsedData.querySelector('description').textContent,
   };
 
-  const itemsCollection = parseredData.querySelectorAll('item');
-  const articles = [...itemsCollection].map(parseElement);
+  const news = parsedData.querySelectorAll('item') || [];
+  const articles = [...news].map(parseNews);
   return { source, articles };
 };

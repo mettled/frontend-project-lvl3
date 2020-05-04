@@ -13,35 +13,40 @@ export const renderForm = (state) => {
   const {
     status, error, input,
   } = state;
+  const inputElement = elements.getElementInput();
+  const buttonElement = elements.getElementButton();
+  const messageElement = elements.getElementMessage();
 
   if (status === 'added') {
-    elements.getElementInput().value = input;
+    inputElement.value = input;
   }
-  elements.getElementButton().disabled = status !== 'valid' || error;
+  buttonElement.disabled = status !== 'valid' || error;
   if (error) {
-    elements.getElementMessage().innerHTML = `${i18next.t(`errors.${error}`)}`;
+    messageElement.innerHTML = `${i18next.t(`errors.${error}`)}`;
 
-    elements.getElementInput().classList.remove('is-valid');
-    elements.getElementInput().classList.add('is-invalid');
-    elements.getElementMessage().classList.remove('valid-feedback');
-    elements.getElementMessage().classList.add('invalid-feedback');
+    inputElement.classList.remove('is-valid');
+    inputElement.classList.add('is-invalid');
+    messageElement.classList.remove('valid-feedback');
+    messageElement.classList.add('invalid-feedback');
   } else {
-    elements.getElementMessage().innerHTML = `${i18next.t(`status.${status}`)}`;
+    messageElement.innerHTML = `${i18next.t(`status.${status}`)}`;
 
-    elements.getElementInput().classList.remove('is-invalid');
-    elements.getElementInput().classList.add('is-valid');
-    elements.getElementMessage().classList.remove('invalid-feedback');
-    elements.getElementMessage().classList.add('valid-feedback');
+    inputElement.classList.remove('is-invalid');
+    inputElement.classList.add('is-valid');
+    messageElement.classList.remove('invalid-feedback');
+    messageElement.classList.add('valid-feedback');
   }
 };
 
+const getTemplateElement = () => document.querySelector('#tmplIL').content.firstElementChild;
+
 export const renderSources = (state) => {
   const { sources } = state;
+  const elemIl = getTemplateElement();
 
-  const liSources = sources.map((feed) => {
+  const nodes = sources.map((feed) => {
     const { description, link } = feed;
-    const li = document.createElement('li');
-    li.classList.add('list-group-item');
+    const li = elemIl.cloneNode(true);
     const a = document.createElement('a');
     a.innerHTML = description;
     a.href = link;
@@ -49,14 +54,15 @@ export const renderSources = (state) => {
     return li;
   });
   elements.getElementSources().innerHTML = '';
-  elements.getElementSources().append(...liSources);
+  elements.getElementSources().append(...nodes);
 };
 
 export const renderArticles = (state) => {
   const { articles } = state;
-  const liArticles = articles.map(({ description, link }) => {
-    const li = document.createElement('li');
-    li.classList.add('list-group-item');
+  const elemIl = getTemplateElement();
+
+  const nodes = articles.map(({ description, link }) => {
+    const li = elemIl.cloneNode(true);
     const a = document.createElement('a');
     a.innerHTML = description;
     a.href = link;
@@ -64,5 +70,5 @@ export const renderArticles = (state) => {
     return li;
   });
   elements.getElementArticles().innerHTML = '';
-  elements.getElementArticles().append(...liArticles);
+  elements.getElementArticles().append(...nodes);
 };

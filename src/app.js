@@ -1,9 +1,9 @@
 import uniqueId from 'lodash/uniqueId';
 import watch from './watch';
-import setInitLocalization from './localization';
+import localize from './localization';
 import getContent from './getContent';
 import validate from './validate';
-import setDefaultState from './setDefaultState';
+import initializeState from './initializeState';
 
 const PERIOD_REQUEST = 5000;
 let timerID;
@@ -12,11 +12,7 @@ const findLink = (checkLink, storage) => (
   Array.from(storage).find(({ link }) => link === checkLink)
 );
 
-export default () => {
-  const state = setDefaultState();
-  setInitLocalization();
-  watch(state);
-
+const initControllers = (state) => {
   const addContentToState = (data) => {
     data.forEach((content) => {
       const {
@@ -64,8 +60,8 @@ export default () => {
       });
   };
 
-  const onContentInput = (event) => {
-    const link = event.target.value;
+  const onContentInput = (e) => {
+    const link = e.target.value;
     if (link.length === 0) {
       state.status = 'empty';
       return;
@@ -74,9 +70,9 @@ export default () => {
     state.status = resultValidation;
   };
 
-  const onContentSubmit = (event) => {
-    event.preventDefault();
-    const form = new FormData(event.target);
+  const onContentSubmit = (e) => {
+    e.preventDefault();
+    const form = new FormData(e.target);
     const link = form.get('url');
 
     clearTimeout(timerID);
@@ -88,4 +84,12 @@ export default () => {
 
   document.querySelector('#rssChanel')
     .addEventListener('submit', onContentSubmit);
+};
+
+
+export default () => {
+  const state = initializeState();
+  localize();
+  initControllers(state);
+  watch(state);
 };
