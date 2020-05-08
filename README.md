@@ -7,10 +7,22 @@
 RSS READER
 [https://rssreader.now.sh](https://rssreader.now.sh)
 
+## Setup
 
-# How to install enviroment
+```sh
+make install
+```
 
-- Download and install lastest Nodejs
-- Run 'npm install' from project folder to download the required modules.
+## Run develop mode
+
+```sh
+make dev
+```
+
+## Run build
+
+```sh
+make build
+```
 
 All dependent modules will be download and install in the 'node_modules' folder
