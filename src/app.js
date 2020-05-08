@@ -3,7 +3,7 @@
 import uniqueId from 'lodash/uniqueId';
 import watch from './watch';
 import localize from './localization';
-import fetchLinks from './fetchArticles';
+import fetchArticles from './fetchArticles';
 import validate from './validate';
 import initializeState from './initializeState';
 import { STATUS, ERROR } from './constants';
