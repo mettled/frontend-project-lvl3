@@ -1,6 +1,6 @@
 import { object, string } from 'yup';
 
-export default (value, storage) => {
+const validate = (value, storage) => {
   const scemaOfValidation = object({
     value: string()
       .url('incorrectLink')
@@ -20,3 +20,5 @@ export default (value, storage) => {
     return { resultValidation: e.message };
   }
 };
+
+export default validate;

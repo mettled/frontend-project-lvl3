@@ -3,5 +3,4 @@ export default () => ({
   error: null,
   sources: [],
   articles: [],
-  input: '',
 });

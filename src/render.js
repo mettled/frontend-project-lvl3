@@ -1,36 +1,38 @@
 import i18next from 'i18next';
 
 const elements = {
-  getElementForm: () => document.querySelector('#rssChanel'),
-  getElementInput: () => elements.getElementForm().querySelector('[name="url"]'),
-  getElementButton: () => elements.getElementForm().querySelector('[name="submit"]'),
-  getElementMessage: () => elements.getElementForm().querySelector('[name="message"]'),
-  getElementSources: () => document.querySelector('#sources'),
-  getElementArticles: () => document.querySelector('#articles'),
+  getFormElement: () => document.querySelector('#rssChanel'),
+  getInputElement: () => elements.getFormElement().querySelector('[name="url"]'),
+  getButtonElement: () => elements.getFormElement().querySelector('[name="submit"]'),
+  getMessageElement: () => elements.getFormElement().querySelector('[name="message"]'),
+  getSourcesElement: () => document.querySelector('#sources'),
+  getArticlesElement: () => document.querySelector('#articles'),
 };
 
 export const renderForm = (state) => {
   const {
-    status, error, input,
+    status, error,
   } = state;
-  const inputElement = elements.getElementInput();
-  const buttonElement = elements.getElementButton();
-  const messageElement = elements.getElementMessage();
+  const inputElement = elements.getInputElement();
+  const buttonElement = elements.getButtonElement();
+  const messageElement = elements.getMessageElement();
 
   if (status === 'added') {
-    inputElement.value = input;
+    inputElement.value = '';
   }
-  buttonElement.disabled = status !== 'valid' || error;
-  if (error) {
-    messageElement.innerHTML = `${i18next.t(`errors.${error}`)}`;
 
+  buttonElement.disabled = status !== 'valid' || error;
+
+  messageElement.innerHTML = (error)
+    ? `${i18next.t(`errors.${error}`)}`
+    : `${i18next.t(`status.${status}`)}`;
+
+  if (error) {
     inputElement.classList.remove('is-valid');
     inputElement.classList.add('is-invalid');
     messageElement.classList.remove('valid-feedback');
     messageElement.classList.add('invalid-feedback');
   } else {
-    messageElement.innerHTML = `${i18next.t(`status.${status}`)}`;
-
     inputElement.classList.remove('is-invalid');
     inputElement.classList.add('is-valid');
     messageElement.classList.remove('invalid-feedback');
@@ -38,37 +40,36 @@ export const renderForm = (state) => {
   }
 };
 
-const getTemplateElement = () => document.querySelector('#tmplIL').content.firstElementChild;
+const getTemplateElement = () => document.querySelector('#template-list').content.firstElementChild;
 
 export const renderSources = (state) => {
   const { sources } = state;
-  const elemIl = getTemplateElement();
+  const liElement = getTemplateElement();
 
-  const nodes = sources.map((feed) => {
-    const { description, link } = feed;
-    const li = elemIl.cloneNode(true);
-    const a = document.createElement('a');
+  const nodes = sources.map(({ description, link }) => {
+    const li = liElement.cloneNode(true);
+    const a = li.firstElementChild;
     a.innerHTML = description;
     a.href = link;
     li.append(a);
     return li;
   });
-  elements.getElementSources().innerHTML = '';
-  elements.getElementSources().append(...nodes);
+  elements.getSourcesElement().innerHTML = '';
+  elements.getSourcesElement().append(...nodes);
 };
 
 export const renderArticles = (state) => {
   const { articles } = state;
-  const elemIl = getTemplateElement();
+  const liElement = getTemplateElement();
 
   const nodes = articles.map(({ description, link }) => {
-    const li = elemIl.cloneNode(true);
-    const a = document.createElement('a');
+    const li = liElement.cloneNode(true);
+    const a = li.firstElementChild;
     a.innerHTML = description;
     a.href = link;
     li.append(a);
     return li;
   });
-  elements.getElementArticles().innerHTML = '';
-  elements.getElementArticles().append(...nodes);
+  elements.getArticlesElement().innerHTML = '';
+  elements.getArticlesElement().append(...nodes);
 };

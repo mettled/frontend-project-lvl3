@@ -1,7 +1,9 @@
+/*  eslint no-param-reassign: 0 */
+
 import uniqueId from 'lodash/uniqueId';
 import watch from './watch';
 import localize from './localization';
-import getContent from './getContent';
+import fetchLinks from './fetchLinks';
 import validate from './validate';
 import initializeState from './initializeState';
 
@@ -13,18 +15,18 @@ const findLink = (checkLink, storage) => (
 );
 
 const initControllers = (state) => {
-  const addContentToState = (data) => {
-    data.forEach((content) => {
+  const addContentToState = (contents) => {
+    contents.forEach((content) => {
       const {
         source: {
           title: sourceTitle, description: sourceDescription, link: sourceLink,
         }, articles,
       } = content;
 
-      const findedSource = findLink(sourceLink, state.sources);
-      const uniqID = findedSource ? findedSource.id : uniqueId();
+      const foundSource = findLink(sourceLink, state.sources);
+      const uniqID = foundSource ? foundSource.id : uniqueId();
 
-      if (!findedSource) {
+      if (!foundSource) {
         state.status = 'added';
         state.sources.push({
           id: uniqID,
@@ -34,7 +36,7 @@ const initControllers = (state) => {
         });
       }
 
-      const newArticles = articles.filter(({ link }) => (!findLink(link, state.articles)));
+      const newArticles = articles.filter(({ link }) => !findLink(link, state.articles));
       if (newArticles.length === 0) {
         return;
       }
@@ -47,9 +49,9 @@ const initControllers = (state) => {
 
   const addContent = (links, periodRequest = false) => {
     const requestLinks = !periodRequest ? [links] : state.sources.map(({ link }) => link);
-    getContent(requestLinks)
-      .then((data) => {
-        addContentToState(data);
+    fetchLinks(requestLinks)
+      .then((contents) => {
+        addContentToState(contents);
         state.error = '';
       })
       .catch(() => {
@@ -86,10 +88,11 @@ const initControllers = (state) => {
     .addEventListener('submit', onContentSubmit);
 };
 
-
-export default () => {
-  const state = initializeState();
+const app = () => {
   localize();
+  const state = initializeState();
   initControllers(state);
   watch(state);
 };
+
+export default app;
