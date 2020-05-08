@@ -1,7 +1,8 @@
 import i18next from 'i18next';
+import { STATUS } from './constants';
 
 const elements = {
-  getFormElement: () => document.querySelector('#rssChanel'),
+  getFormElement: () => document.querySelector('#rssChannel'),
   getInputElement: () => elements.getFormElement().querySelector('[name="url"]'),
   getButtonElement: () => elements.getFormElement().querySelector('[name="submit"]'),
   getMessageElement: () => elements.getFormElement().querySelector('[name="message"]'),
@@ -17,22 +18,37 @@ export const renderForm = (state) => {
   const buttonElement = elements.getButtonElement();
   const messageElement = elements.getMessageElement();
 
-  if (status === 'added') {
-    inputElement.value = '';
+  switch (status) {
+    case STATUS.EMPTY:
+      buttonElement.disabled = !!error;
+      break;
+    case STATUS.VALID:
+      buttonElement.disabled = false;
+      break;
+    case STATUS.INCORRECT:
+      buttonElement.disabled = !!error;
+      break;
+    case STATUS.DUBLICATE:
+      buttonElement.disabled = !!error;
+      break;
+    case STATUS.ADDED:
+      inputElement.value = '';
+      break;
+    default:
+      buttonElement.disabled = false;
+      break;
   }
 
-  buttonElement.disabled = status !== 'valid' || error;
-
-  messageElement.innerHTML = (error)
-    ? `${i18next.t(`errors.${error}`)}`
-    : `${i18next.t(`status.${status}`)}`;
-
   if (error) {
+    messageElement.innerHTML = `${i18next.t(`errors.${error}`)}`;
+
     inputElement.classList.remove('is-valid');
     inputElement.classList.add('is-invalid');
     messageElement.classList.remove('valid-feedback');
     messageElement.classList.add('invalid-feedback');
   } else {
+    messageElement.innerHTML = `${i18next.t(`status.${status}`)}`;
+
     inputElement.classList.remove('is-invalid');
     inputElement.classList.add('is-valid');
     messageElement.classList.remove('invalid-feedback');

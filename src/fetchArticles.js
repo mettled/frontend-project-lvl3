@@ -4,7 +4,7 @@ import parse from './parse';
 // const CORS_PROXY = 'https://cors-anywhere.herokuapp.com/';
 const CORS_PROXY = 'https://api.allorigins.win/get?charset=ISO-8859-1&url=';
 
-const fetchLinks = (links) => {
+const fetchArticles = (links) => {
   const requests = links.map((link) => axios.get(`${CORS_PROXY}${link}`));
   return Promise.all(requests)
     .then((responses) => (
@@ -14,9 +14,10 @@ const fetchLinks = (links) => {
             title, description,
           }, articles,
         } = parse(contents);
+
         return { source: { title, description, link: url }, articles };
       })
     ));
 };
 
-export default fetchLinks;
+export default fetchArticles;

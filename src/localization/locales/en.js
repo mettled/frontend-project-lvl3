@@ -1,14 +1,16 @@
+import { STATUS, ERROR } from '../../constants';
+
 export default {
   translation: {
     errors: {
-      networkError: 'Check network connection',
+      [ERROR.NETWORK]: 'Check network connection',
     },
     status: {
-      empty: '',
-      valid: 'Entered chanel is valid',
-      incorrectLink: 'Please enter correct link',
-      dublicateLink: 'Please enter another link, it was already added',
-      added: 'Chanel was added',
+      [STATUS.EMPTY]: '',
+      [STATUS.VALID]: 'Entered channel is valid',
+      [STATUS.INCORRECT]: 'Please enter correct link',
+      [STATUS.DUBLICATE]: 'Please enter another link, it was already added',
+      [STATUS.ADDED]: 'Channel was added',
     },
   },
 };

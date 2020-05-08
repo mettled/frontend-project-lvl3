@@ -1,12 +1,13 @@
 import { object, string } from 'yup';
+import { STATUS } from './constants';
 
 const validate = (value, storage) => {
   const scemaOfValidation = object({
     value: string()
-      .url('incorrectLink')
+      .url(STATUS.INCORRECT)
       .test({
         name: 'Dublicate check link',
-        message: 'dublicateLink',
+        message: STATUS.DUBLICATE,
         params: { storage },
         test: (checkLink) => (!Array.from(storage).find(({ link }) => link === checkLink)),
       }),
@@ -15,7 +16,7 @@ const validate = (value, storage) => {
   try {
     scemaOfValidation
       .validateSync({ value });
-    return { resultValidation: 'valid' };
+    return { resultValidation: STATUS.VALID };
   } catch (e) {
     return { resultValidation: e.message };
   }

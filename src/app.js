@@ -3,9 +3,10 @@
 import uniqueId from 'lodash/uniqueId';
 import watch from './watch';
 import localize from './localization';
-import fetchLinks from './fetchLinks';
+import fetchLinks from './fetchArticles';
 import validate from './validate';
 import initializeState from './initializeState';
+import { STATUS, ERROR } from './constants';
 
 const PERIOD_REQUEST = 5000;
 let timerID;
@@ -27,7 +28,7 @@ const initControllers = (state) => {
       const uniqID = foundSource ? foundSource.id : uniqueId();
 
       if (!foundSource) {
-        state.status = 'added';
+        state.status = STATUS.ADDED;
         state.sources.push({
           id: uniqID,
           title: sourceTitle,
@@ -49,13 +50,13 @@ const initControllers = (state) => {
 
   const addContent = (links, periodRequest = false) => {
     const requestLinks = !periodRequest ? [links] : state.sources.map(({ link }) => link);
-    fetchLinks(requestLinks)
+    fetchArticles(requestLinks)
       .then((contents) => {
         addContentToState(contents);
-        state.error = '';
+        state.error = ERROR.EMPTY;
       })
       .catch(() => {
-        state.error = 'networkError';
+        state.error = ERROR.NETWORK;
       })
       .finally(() => {
         timerID = setTimeout(addContent, PERIOD_REQUEST, [], true);
@@ -65,7 +66,7 @@ const initControllers = (state) => {
   const onContentInput = (e) => {
     const link = e.target.value;
     if (link.length === 0) {
-      state.status = 'empty';
+      state.status = STATUS.EMPTY;
       return;
     }
     const { resultValidation } = validate(link, state.sources);
@@ -81,18 +82,23 @@ const initControllers = (state) => {
     addContent(link, false);
   };
 
-  document.querySelector('#rssChanel input')
+  document.querySelector('#rssChannel input')
     .addEventListener('input', onContentInput);
 
-  document.querySelector('#rssChanel')
+  document.querySelector('#rssChannel')
     .addEventListener('submit', onContentSubmit);
 };
 
 const app = () => {
-  localize();
-  const state = initializeState();
-  initControllers(state);
-  watch(state);
+  localize()
+    .catch(() => {
+      console.log('Something went wrong during initialization');
+    })
+    .finally(() => {
+      const state = initializeState();
+      initControllers(state);
+      watch(state);
+    });
 };
 
 export default app;
