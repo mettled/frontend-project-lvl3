@@ -14,11 +14,10 @@ const validate = (value, storage) => {
   });
 
   try {
-    scemaOfValidation
-      .validateSync({ value });
-    return { resultValidation: STATUS.VALID };
+    scemaOfValidation.validateSync({ value });
+    return { status: STATUS.VALID };
   } catch (e) {
-    return { resultValidation: e.message };
+    return { status: e.message };
   }
 };
 

@@ -6,7 +6,7 @@ import localize from './localization';
 import fetchArticles from './fetchArticles';
 import validate from './validate';
 import initializeState from './initializeState';
-import { STATUS, ERROR } from './constants';
+import { STATUS, ERRORS } from './constants';
 
 const PERIOD_REQUEST = 5000;
 let timerID;
@@ -17,18 +17,17 @@ const findLink = (checkLink, storage) => (
 
 const initControllers = (state) => {
   const addContentToState = (contents) => {
-    contents.forEach((content) => {
-      const {
-        source: {
-          title: sourceTitle, description: sourceDescription, link: sourceLink,
-        }, articles,
-      } = content;
-
+    contents.forEach(({
+      source: {
+        title: sourceTitle, description: sourceDescription, link: sourceLink,
+      }, articles,
+    }) => {
       const foundSource = findLink(sourceLink, state.sources);
       const uniqID = foundSource ? foundSource.id : uniqueId();
 
       if (!foundSource) {
         state.status = STATUS.ADDED;
+        state.error = ERRORS.EMPTY;
         state.sources.push({
           id: uniqID,
           title: sourceTitle,
@@ -36,7 +35,6 @@ const initControllers = (state) => {
           link: sourceLink,
         });
       }
-
       const newArticles = articles.filter(({ link }) => !findLink(link, state.articles));
       if (newArticles.length === 0) {
         return;
@@ -48,29 +46,29 @@ const initControllers = (state) => {
     });
   };
 
-  const addContent = (links, periodRequest = false) => {
+  const getContent = (links, periodRequest = false) => {
     const requestLinks = !periodRequest ? [links] : state.sources.map(({ link }) => link);
     fetchArticles(requestLinks)
       .then((contents) => {
         addContentToState(contents);
-        state.error = ERROR.EMPTY;
       })
       .catch(() => {
-        state.error = ERROR.NETWORK;
+        state.status = STATUS.ERROR;
+        state.error = ERRORS.NETWORK;
       })
       .finally(() => {
-        timerID = setTimeout(addContent, PERIOD_REQUEST, [], true);
+        timerID = setTimeout(getContent, PERIOD_REQUEST, [], true);
       });
   };
 
-  const onContentInput = (e) => {
-    const link = e.target.value;
-    if (link.length === 0) {
+  const onContentInput = ({ target: { value } }) => {
+    state.error = ERRORS.EMPTY;
+    if (value.length === 0) {
       state.status = STATUS.EMPTY;
       return;
     }
-    const { resultValidation } = validate(link, state.sources);
-    state.status = resultValidation;
+    const { status } = validate(value, state.sources);
+    state.status = status;
   };
 
   const onContentSubmit = (e) => {
@@ -78,8 +76,11 @@ const initControllers = (state) => {
     const form = new FormData(e.target);
     const link = form.get('url');
 
+    state.status = STATUS.WAIT;
+    state.error = ERRORS.EMPTY;
+
     clearTimeout(timerID);
-    addContent(link, false);
+    getContent(link, false);
   };
 
   document.querySelector('#rssChannel input')

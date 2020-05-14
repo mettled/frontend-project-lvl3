@@ -1,14 +1,16 @@
 const STATUS = {
   EMPTY: 'empty',
   VALID: 'valid',
+  WAIT: 'wait',
+  ADDED: 'added',
   INCORRECT: 'incorrectLink',
   DUBLICATE: 'dublicateLink',
-  ADDED: 'added',
+  ERRORS: 'errors',
 };
 
-const ERROR = {
+const ERRORS = {
   EMPTY: '',
   NETWORK: 'networkError',
 };
 
-export { STATUS, ERROR };
+export { STATUS, ERRORS };

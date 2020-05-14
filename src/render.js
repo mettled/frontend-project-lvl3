@@ -10,56 +10,46 @@ const elements = {
   getArticlesElement: () => document.querySelector('#articles'),
 };
 
-export const renderForm = (state) => {
-  const {
-    status, error,
-  } = state;
+export const renderForm = ({ status, error }) => {
   const inputElement = elements.getInputElement();
   const buttonElement = elements.getButtonElement();
   const messageElement = elements.getMessageElement();
 
+  const renderingElement = (text, statusBtn = false, classAddMsg = '', classAddInput = '') => {
+    messageElement.innerHTML = i18next.t(`${text}`);
+    buttonElement.disabled = statusBtn;
+    inputElement.classList.value = `form-control ${classAddInput}`;
+    messageElement.classList.value = `form-text ${classAddMsg}`;
+  };
+
   switch (status) {
+    case STATUS.ERROR:
+      renderingElement(`errors.${error}`, false, 'text-danger', 'is-invalid');
+      break;
     case STATUS.EMPTY:
-      buttonElement.disabled = !!error;
+      renderingElement(`status.${status}`, true, 'text-muted', '');
       break;
-    case STATUS.VALID:
-      buttonElement.disabled = false;
+    case STATUS.WAIT:
+      renderingElement(`status.${status}`, true, 'text-muted', 'is-valid');
       break;
-    case STATUS.INCORRECT:
-      buttonElement.disabled = !!error;
+    case STATUS.VALID: {
+      renderingElement(`status.${status}`, false, 'text-success', 'is-valid');
       break;
-    case STATUS.DUBLICATE:
-      buttonElement.disabled = !!error;
-      break;
-    case STATUS.ADDED:
+    }
+    case STATUS.ADDED: {
+      renderingElement(`status.${status}`, true, 'text-muted', '');
       inputElement.value = '';
       break;
+    }
     default:
-      buttonElement.disabled = false;
+      renderingElement(`status.${status}`, true, 'text-muted', '');
       break;
-  }
-
-  if (error) {
-    messageElement.innerHTML = `${i18next.t(`errors.${error}`)}`;
-
-    inputElement.classList.remove('is-valid');
-    inputElement.classList.add('is-invalid');
-    messageElement.classList.remove('valid-feedback');
-    messageElement.classList.add('invalid-feedback');
-  } else {
-    messageElement.innerHTML = `${i18next.t(`status.${status}`)}`;
-
-    inputElement.classList.remove('is-invalid');
-    inputElement.classList.add('is-valid');
-    messageElement.classList.remove('invalid-feedback');
-    messageElement.classList.add('valid-feedback');
   }
 };
 
 const getTemplateElement = () => document.querySelector('#template-list').content.firstElementChild;
 
-export const renderSources = (state) => {
-  const { sources } = state;
+export const renderSources = ({ sources }) => {
   const liElement = getTemplateElement();
 
   const nodes = sources.map(({ description, link }) => {
@@ -74,8 +64,7 @@ export const renderSources = (state) => {
   elements.getSourcesElement().append(...nodes);
 };
 
-export const renderArticles = (state) => {
-  const { articles } = state;
+export const renderArticles = ({ articles }) => {
   const liElement = getTemplateElement();
 
   const nodes = articles.map(({ description, link }) => {
