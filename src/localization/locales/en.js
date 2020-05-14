@@ -8,7 +8,7 @@ export default {
     },
     status: {
       [STATUS.EMPTY]: 'Please add RSS channel',
-      [STATUS.VALID]: 'Entered channel is valid',
+      [STATUS.VALID]: 'Channel is valid',
       [STATUS.WAIT]: 'Waiting....',
       [STATUS.ADDED]: 'Channel was added',
       [STATUS.INCORRECT]: 'Please enter correct link',
