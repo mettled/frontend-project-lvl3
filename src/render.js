@@ -58,7 +58,7 @@ export const renderSources = ({ sources }) => {
   const nodes = sources.map(({ description, link }) => {
     const li = liElement.cloneNode(true);
     const a = li.firstElementChild;
-    a.innerHTML = description;
+    a.innerHTML = description || link;
     a.href = link;
     li.append(a);
     return li;

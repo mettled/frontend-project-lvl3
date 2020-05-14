@@ -11,6 +11,7 @@ const STATUS = {
 const ERRORS = {
   EMPTY: '',
   NETWORK: 'networkError',
+  NOFEED: 'noFeed',
 };
 
 export { STATUS, ERRORS };

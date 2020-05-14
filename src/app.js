@@ -52,9 +52,9 @@ const initControllers = (state) => {
       .then((contents) => {
         addContentToState(contents);
       })
-      .catch(() => {
+      .catch(({ message }) => {
         state.status = STATUS.ERROR;
-        state.error = ERRORS.NETWORK;
+        state.error = message === ERRORS.NOFEED ? ERRORS.NOFEED : ERRORS.NETWORK;
       })
       .finally(() => {
         timerID = setTimeout(getContent, PERIOD_REQUEST, [], true);
