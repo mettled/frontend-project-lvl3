@@ -4,7 +4,7 @@ export default {
   translation: {
     errors: {
       [ERRORS.EMPTY]: '',
-      [ERRORS.NETWORK]: 'Check network connection',
+      [ERRORS.NETWORK]: 'Check network connection OR link doesnt contain RSS-feed',
     },
     status: {
       [STATUS.EMPTY]: 'Please add RSS channel',
