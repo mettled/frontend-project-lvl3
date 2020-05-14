@@ -27,7 +27,7 @@ export const renderForm = ({ status, error }) => {
       break;
     case STATUS.INCORRECT:
     case STATUS.DUBLICATE:
-      renderingElement(`status.${status}`, false, 'text-danger', 'is-invalid');
+      renderingElement(`status.${status}`, true, 'text-danger', 'is-invalid');
       break;
     case STATUS.EMPTY:
       renderingElement(`status.${status}`, true, 'text-muted', '');
