@@ -21,10 +21,13 @@ export const renderForm = ({ status, error }) => {
     inputElement.classList.value = `form-control ${classAddInput}`;
     messageElement.classList.value = `form-text ${classAddMsg}`;
   };
-
   switch (status) {
     case STATUS.ERROR:
       renderingElement(`errors.${error}`, false, 'text-danger', 'is-invalid');
+      break;
+    case STATUS.INCORRECT:
+    case STATUS.DUBLICATE:
+      renderingElement(`status.${status}`, false, 'text-danger', 'is-invalid');
       break;
     case STATUS.EMPTY:
       renderingElement(`status.${status}`, true, 'text-muted', '');
