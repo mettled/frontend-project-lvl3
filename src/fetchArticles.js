@@ -16,8 +16,7 @@ const fetchArticles = (links) => {
       }
       return responses
         .filter(({ status }) => status === 'fulfilled')
-        .map(({ value: { data: { contents, status: { url } } }}) => {
-          console.log('value')
+        .map(({ value: { data: { contents, status: { url } } } }) => {
           try {
             const {
               source: {
@@ -30,7 +29,7 @@ const fetchArticles = (links) => {
             throw new Error(ERRORS.NOFEED);
           }
         });
-      });
+    });
 };
 
 export default fetchArticles;

@@ -23,7 +23,6 @@ const initControllers = (state) => {
         title: sourceTitle, description: sourceDescription, link: sourceLink,
       }, articles,
     }) => {
-      
       const foundSource = checkLink(sourceLink, state.sources);
       const uniqID = foundSource ? foundSource.id : uniqueId();
 
@@ -81,7 +80,6 @@ const initControllers = (state) => {
 
     state.status = STATUS.WAIT;
     state.error = ERRORS.EMPTY;
-    console.log(link)
     clearTimeout(timerID);
     getContent([link], false);
   };

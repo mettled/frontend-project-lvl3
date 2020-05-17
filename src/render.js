@@ -22,7 +22,6 @@ export const renderForm = ({ status, error }) => {
     messageElement.classList.value = `form-text ${classAddMsg}`;
   };
 
-  console.log('----',status)
   switch (status) {
     case STATUS.ERROR:
       renderingElement(`errors.${error}`, true, 'text-danger', 'is-invalid');
