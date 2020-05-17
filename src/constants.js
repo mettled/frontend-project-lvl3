@@ -3,14 +3,14 @@ const STATUS = {
   VALID: 'valid',
   WAIT: 'wait',
   ADDED: 'added',
-  INCORRECT: 'incorrectLink',
-  DUBLICATE: 'dublicateLink',
-  ERRORS: 'errors',
+  ERROR: 'errors',
 };
 
 const ERRORS = {
   EMPTY: '',
   NETWORK: 'networkError',
+  INCORRECT: 'incorrectLink',
+  DUBLICATE: 'dublicateLink',
   NOFEED: 'noFeed',
 };
 

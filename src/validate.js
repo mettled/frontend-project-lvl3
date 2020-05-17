@@ -1,23 +1,23 @@
 import { object, string } from 'yup';
-import { STATUS } from './constants';
+import { STATUS, ERRORS } from './constants';
 
-const validate = (value, storage) => {
+const validate = (value, links) => {
   const scemaOfValidation = object({
     value: string()
-      .url(STATUS.INCORRECT)
+      .url(ERRORS.INCORRECT)
       .test({
         name: 'Dublicate check link',
-        message: STATUS.DUBLICATE,
-        params: { storage },
-        test: (checkLink) => (!Array.from(storage).find(({ link }) => link === checkLink)),
+        message: ERRORS.DUBLICATE,
+        params: { links },
+        test: (checkLink) => (!links.find(({ link }) => link === checkLink)),
       }),
   });
 
   try {
     scemaOfValidation.validateSync({ value });
-    return { status: STATUS.VALID };
+    return { status: STATUS.VALID, error: ERRORS.EMPTY };
   } catch (e) {
-    return { status: e.message };
+    return { status: STATUS.ERROR, error: e.message };
   }
 };
 

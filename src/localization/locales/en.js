@@ -5,6 +5,8 @@ export default {
     errors: {
       [ERRORS.EMPTY]: '',
       [ERRORS.NETWORK]: 'Check network connection',
+      [ERRORS.INCORRECT]: 'Please enter correct link',
+      [ERRORS.DUBLICATE]: 'Please enter another link, it was already added',
       [ERRORS.NOFEED]: 'Link doesnt contain RSS-feed',
     },
     status: {
@@ -12,8 +14,6 @@ export default {
       [STATUS.VALID]: 'Channel is valid',
       [STATUS.WAIT]: 'Waiting....',
       [STATUS.ADDED]: 'Channel was added',
-      [STATUS.INCORRECT]: 'Please enter correct link',
-      [STATUS.DUBLICATE]: 'Please enter another link, it was already added',
       [STATUS.ERROR]: '',
     },
   },

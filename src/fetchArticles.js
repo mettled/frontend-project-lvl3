@@ -8,22 +8,29 @@ const CORS_PROXY = 'https://api.allorigins.win/get?charset=ISO-8859-1&url=';
 const fetchArticles = (links) => {
   const requests = links.map((link) => axios.get(`${CORS_PROXY}${link}`));
 
-  return Promise.all(requests)
-    .then((responses) => (
-      responses.map(({ data: { contents, status: { url } } }) => {
-        try {
-          const {
-            source: {
-              title, description,
-            }, articles,
-          } = parse(contents);
+  return Promise.allSettled(requests)
+    .then((responses) => {
+      const errors = responses.filter(({ status }) => status === 'rejected');
+      if (errors.length === links.length) {
+        throw new Error(ERRORS.NETWORK);
+      }
+      return responses
+        .filter(({ status }) => status === 'fulfilled')
+        .map(({ value: { data: { contents, status: { url } } }}) => {
+          console.log('value')
+          try {
+            const {
+              source: {
+                title, description,
+              }, articles,
+            } = parse(contents);
 
-          return { source: { title, description, link: url }, articles };
-        } catch {
-          throw new Error(ERRORS.NOFEED);
-        }
-      })
-    ));
+            return { source: { title, description, link: url }, articles };
+          } catch {
+            throw new Error(ERRORS.NOFEED);
+          }
+        });
+      });
 };
 
 export default fetchArticles;
