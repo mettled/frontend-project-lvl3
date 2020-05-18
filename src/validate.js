@@ -9,7 +9,9 @@ const validate = (value, links) => {
         name: 'Dublicate check link',
         message: ERRORS.DUBLICATE,
         params: { links },
-        test: (checkLink) => (!links.find(({ link }) => link === checkLink)),
+        test: (checkLink) => (
+          !links.find(({ link }) => link === checkLink)
+        ),
       }),
   });
 

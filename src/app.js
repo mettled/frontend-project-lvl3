@@ -1,48 +1,39 @@
 /*  eslint no-param-reassign: 0 */
 
-import uniqueId from 'lodash/uniqueId';
+import { uniqueId, head } from 'lodash';
 import watch from './watch';
 import initLocalization from './localization';
 import fetchArticles from './fetchArticles';
 import validate from './validate';
 import initializeState from './initializeState';
 import { STATUS, ERRORS } from './constants';
-
-const PERIOD_REQUEST = 5000;
-
-const checkLink = (checkingLink, storage) => (
-  storage.find(({ link }) => link === checkingLink)
-);
+import {
+  checkLink, getNewArticles, addIDToArticles, makeSourceItem,
+} from './helpers';
 
 const initControllers = (state) => {
+  const PERIOD_REQUEST = 5000;
   let timerID;
 
   const addContentToState = (contents) => {
     contents.forEach(({
-      source: {
-        title: sourceTitle, description: sourceDescription, link: sourceLink,
-      }, articles,
+      source,
+      articles,
     }) => {
-      const foundSource = checkLink(sourceLink, state.sources);
-      const uniqID = foundSource ? foundSource.id : uniqueId();
+      const foundSource = checkLink(source.link, state.sources);
+      const sourceId = foundSource ? foundSource.id : uniqueId();
 
       if (!foundSource) {
-        state.status = STATUS.ADDED;
-        state.error = ERRORS.EMPTY;
-        state.sources.push({
-          id: uniqID,
-          title: sourceTitle,
-          description: sourceDescription,
-          link: sourceLink,
-        });
+        state.statusForm = STATUS.ADDED;
+        state.errorForm = ERRORS.EMPTY;
+        const sourceItem = makeSourceItem(sourceId, source);
+        state.sources.push(sourceItem);
       }
-      const newArticles = articles.filter(({ link }) => !checkLink(link, state.articles));
+      const newArticles = getNewArticles(articles, state.articles);
       if (newArticles.length === 0) {
         return;
       }
-      const articlesWithID = newArticles.map(({ title, description, link }) => ({
-        sourceId: uniqID, title, description, link,
-      }));
+      const articlesWithID = addIDToArticles(sourceId, newArticles);
       state.articles.push(...articlesWithID);
     });
   };
@@ -51,26 +42,33 @@ const initControllers = (state) => {
     const requestLinks = !periodRequest ? links : state.sources.map(({ link }) => link);
     fetchArticles(requestLinks)
       .then((contents) => {
+        if (state.statusForm === STATUS.WAIT && !head(contents).isRSS) {
+          state.statusForm = STATUS.ERROR;
+          state.errorForm = ERRORS.NOFEED;
+          return;
+        }
         addContentToState(contents);
       })
-      .catch(({ message }) => {
-        state.status = STATUS.ERROR;
-        state.error = message;
+      .catch(() => {
+        state.statusForm = STATUS.ERROR;
+        state.errorForm = ERRORS.NETWORK;
       })
       .finally(() => {
-        timerID = setTimeout(getContent, PERIOD_REQUEST, [], true);
+        if (state.sources.length > 0) {
+          timerID = setTimeout(getContent, PERIOD_REQUEST, [], true);
+        }
       });
   };
 
   const onInput = ({ target: { value } }) => {
-    state.error = ERRORS.EMPTY;
+    state.errorForm = ERRORS.EMPTY;
     if (value.length === 0) {
-      state.status = STATUS.EMPTY;
+      state.statusForm = STATUS.EMPTY;
       return;
     }
     const { status, error } = validate(value, state.sources);
-    state.status = status;
-    state.error = error;
+    state.statusForm = status;
+    state.errorForm = error;
   };
 
   const onSubmit = (e) => {
@@ -78,8 +76,8 @@ const initControllers = (state) => {
     const form = new FormData(e.target);
     const link = form.get('url');
 
-    state.status = STATUS.WAIT;
-    state.error = ERRORS.EMPTY;
+    state.statusForm = STATUS.WAIT;
+    state.errorForm = ERRORS.EMPTY;
     clearTimeout(timerID);
     getContent([link], false);
   };

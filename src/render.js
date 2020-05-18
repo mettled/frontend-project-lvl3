@@ -10,7 +10,7 @@ const elements = {
   getArticlesElement: () => document.querySelector('#articles'),
 };
 
-export const renderForm = ({ status, error }) => {
+export const renderForm = ({ statusForm, errorForm }) => {
   const inputElement = elements.getInputElement();
   const buttonElement = elements.getButtonElement();
   const messageElement = elements.getMessageElement();
@@ -22,27 +22,25 @@ export const renderForm = ({ status, error }) => {
     messageElement.classList.value = `form-text ${classAddMsg}`;
   };
 
-  switch (status) {
+  switch (statusForm) {
     case STATUS.ERROR:
-      renderingElement(`errors.${error}`, true, 'text-danger', 'is-invalid');
+      renderingElement(`errors.${errorForm}`, true, 'text-danger', 'is-invalid');
       break;
     case STATUS.EMPTY:
-      renderingElement(`status.${status}`, true, 'text-muted', '');
+      renderingElement(`status.${statusForm}`, true, 'text-muted', '');
       break;
     case STATUS.WAIT:
-      renderingElement(`status.${status}`, true, 'text-muted', 'is-valid');
+      renderingElement(`status.${statusForm}`, true, 'text-muted', 'is-valid');
       break;
-    case STATUS.VALID: {
-      renderingElement(`status.${status}`, false, 'text-success', 'is-valid');
+    case STATUS.VALID:
+      renderingElement(`status.${statusForm}`, false, 'text-success', 'is-valid');
       break;
-    }
-    case STATUS.ADDED: {
-      renderingElement(`status.${status}`, true, 'text-muted', '');
+    case STATUS.ADDED:
+      renderingElement(`status.${statusForm}`, true, 'text-muted', '');
       inputElement.value = '';
       break;
-    }
     default:
-      renderingElement(`status.${status}`, true, 'text-muted', '');
+      renderingElement(`status.${statusForm}`, true, 'text-muted', '');
       break;
   }
 };
