@@ -12,6 +12,6 @@ export const addIDToArticles = (id, articles) => (
   }))
 );
 
-export const makeSourceItem = (id, source) => ({
+export const addIDToSource = (id, source) => ({
   id, ...source,
 });

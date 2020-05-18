@@ -8,7 +8,7 @@ import validate from './validate';
 import initializeState from './initializeState';
 import { STATUS, ERRORS } from './constants';
 import {
-  checkLink, getNewArticles, addIDToArticles, makeSourceItem,
+  checkLink, getNewArticles, addIDToArticles, addIDToSource,
 } from './helpers';
 
 const initControllers = (state) => {
@@ -26,7 +26,7 @@ const initControllers = (state) => {
       if (!foundSource) {
         state.statusForm = STATUS.ADDED;
         state.errorForm = ERRORS.EMPTY;
-        const sourceItem = makeSourceItem(sourceId, source);
+        const sourceItem = addIDToSource(sourceId, source);
         state.sources.push(sourceItem);
       }
       const newArticles = getNewArticles(articles, state.articles);
