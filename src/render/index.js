@@ -51,7 +51,7 @@ export const renderSources = ({ sources }) => {
     const a = templateLiElement.firstElementChild;
     a.innerHTML = description || link;
     a.href = link;
-    a.classList.value = classNames({ 'no-source': !status, 'ok-source': status })
+    a.classList.value = classNames({ 'no-source': !status, 'ok-source': status });
     li.append(a);
     return li;
   });
