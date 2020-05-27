@@ -37,7 +37,6 @@ const updateSources = (state) => {
   const { sources } = state;
   const requests = sources.map(({ link }) => makeRequest(link));
   const sourcesID = sources.map(({ id }) => id);
-  
   return Promise.allSettled(requests)
     .then((responses) => (
       responses
@@ -46,7 +45,6 @@ const updateSources = (state) => {
             sources[index].status = false;
             return;
           }
-
           const { articles } = parse(response.contents);
           const newArticles = getNewArticles(articles, state.articles);
           if (newArticles.length === 0) {
