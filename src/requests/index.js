@@ -40,10 +40,7 @@ const updateSources = (state) => {
   return Promise.allSettled(requests)
     .then((responses) => (
       responses.forEach((response, index) => {
-        if (response.status === 'rejected') {
-          sources[index].status = false;
-          return;
-        }
+        sources[index].status = response.status === 'fulfilled';
         const { articles } = parse(response.contents);
         const newArticles = getNewArticles(articles, state.articles);
         if (newArticles.length === 0) {
