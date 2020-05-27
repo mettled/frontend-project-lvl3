@@ -1,9 +1,5 @@
-export const checkLink = (checkingLink, storage) => (
-  storage.find(({ link }) => link === checkingLink)
-);
-
 export const getNewArticles = (articles, storage) => (
-  articles.filter(({ link }) => !storage.find((storageLink) => link === storageLink))
+  articles.filter(({ link }) => !storage.find(({ link: storageLink }) => link === storageLink))
 );
 
 export const addIDToArticles = (id, articles) => (
@@ -13,5 +9,5 @@ export const addIDToArticles = (id, articles) => (
 );
 
 export const addIDToSource = (id, source) => ({
-  id, ...source,
+  id, ...source, status: true,
 });

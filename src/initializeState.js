@@ -1,6 +1,8 @@
 export default () => ({
-  statusForm: 'empty',
-  errorForm: null,
+  form: {
+    status: 'empty',
+    error: null,
+  },
   sources: [],
   articles: [],
 });

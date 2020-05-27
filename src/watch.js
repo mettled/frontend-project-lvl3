@@ -2,7 +2,7 @@ import { watch } from 'melanke-watchjs';
 import { renderForm, renderSources, renderArticles } from './render';
 
 export default (state) => {
-  watch(state, ['errorForm', 'statusForm'], () => {
+  watch(state.form, ['error', 'status'], () => {
     renderForm(state);
   });
 
