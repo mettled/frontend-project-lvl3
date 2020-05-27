@@ -1,6 +1,7 @@
 import i18next from 'i18next';
 import classNames from 'classnames';
 import { STATUS } from '../constants';
+import './index.css';
 
 const formElement = document.querySelector('#rssChannel');
 const inputElement = formElement.querySelector('[name="url"]');
@@ -12,16 +13,6 @@ const templateElement = document
   .querySelector('#template-list')
   .content
   .firstElementChild;
-
-const makeItem = ({ description, link }) => {
-  const templateLiElement = templateElement.cloneNode(true);
-  const li = templateLiElement;
-  const a = templateLiElement.firstElementChild;
-  a.innerHTML = description || link;
-  a.href = link;
-  li.append(a);
-  return li;
-};
 
 const renderingElement = (text, statusBtn = false, classAddMsg = '', classAddInput = '') => {
   messageElement.innerHTML = i18next.t(`${text}`);
@@ -54,13 +45,30 @@ export const renderForm = ({ form: { status, error } }) => {
 };
 
 export const renderSources = ({ sources }) => {
-  const nodes = sources.map(makeItem);
+  const nodes = sources.map(({ description, link, status }) => {
+    const templateLiElement = templateElement.cloneNode(true);
+    const li = templateLiElement;
+    const a = templateLiElement.firstElementChild;
+    a.innerHTML = description || link;
+    a.href = link;
+    a.classList.value = classNames({ 'no-source': !status, 'ok-source': status })
+    li.append(a);
+    return li;
+  });
   sourceElement.innerHTML = '';
   sourceElement.append(...nodes);
 };
 
 export const renderArticles = ({ articles }) => {
-  const nodes = articles.map(makeItem);
+  const nodes = articles.map(({ description, link }) => {
+    const templateLiElement = templateElement.cloneNode(true);
+    const li = templateLiElement;
+    const a = templateLiElement.firstElementChild;
+    a.innerHTML = description || link;
+    a.href = link;
+    li.append(a);
+    return li;
+  });
   articlesElement.innerHTML = '';
   articlesElement.append(...nodes);
 };
