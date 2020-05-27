@@ -34,25 +34,26 @@ const addSource = ({ sources: sourcesState, articles: articlesState, form }, lin
 );
 
 const updateSources = (state) => {
-  const { sources } = state;
+  const { sources, articles: stateArticles, form } = state;
   const requests = sources.map(({ link }) => makeRequest(link));
   const sourcesID = sources.map(({ id }) => id);
   return Promise.allSettled(requests)
     .then((responses) => (
-      responses.forEach((response, index) => {
-        sources[index].status = response.status === 'fulfilled';
-        const { articles } = parse(response.contents);
-        const newArticles = getNewArticles(articles, state.articles);
+      responses.forEach(({ value: { data: { contents } }, status }, index) => {
+        sources[index].status = status === 'fulfilled';
+        const { articles } = parse(contents);
+        const newArticles = getNewArticles(articles, stateArticles);
+
         if (newArticles.length === 0) {
           return;
         }
         const articlesWithID = addIDToArticles(sourcesID[index], newArticles);
-        state.articles.push(...articlesWithID);
+        stateArticles.push(...articlesWithID);
       })
     ))
     .catch(() => {
-      state.form.status = STATUS.ERROR;
-      state.form.error = ERRORS.NETWORK;
+      form.status = STATUS.ERROR;
+      form.error = ERRORS.NETWORK;
     })
     .finally(() => {
       setTimeout(updateSources, PERIOD_REQUEST, state);
