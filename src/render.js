@@ -44,7 +44,7 @@ export const renderSources = ({ sources }, { sourcesElement, templateElement }) 
   const nodes = sources.map(({ description, link, status }) => {
     const templateLiElement = templateElement.cloneNode(true);
     const li = templateLiElement;
-    if (status) {
+    if (!status) {
       li.classList.add('list-group-item-danger');
     }
     const a = templateLiElement.firstElementChild;
