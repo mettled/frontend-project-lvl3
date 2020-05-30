@@ -16,7 +16,7 @@ const parse = (content) => {
     const articles = [...items].map(parseArticle);
     return { source, articles };
   } catch (e) {
-    return null;
+    return { error: e.message };
   }
 };
 

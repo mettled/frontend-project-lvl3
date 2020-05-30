@@ -7,7 +7,6 @@ const STATUS = {
 };
 
 const ERRORS = {
-  EMPTY: '',
   NETWORK: 'networkError',
   INCORRECT: 'incorrectLink',
   DUBLICATE: 'dublicateLink',

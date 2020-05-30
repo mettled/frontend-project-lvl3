@@ -1,5 +1,5 @@
 import { object, string } from 'yup';
-import { STATUS, ERRORS } from './constants';
+import { ERRORS } from './constants';
 
 const validate = (value, links) => {
   const scemaOfValidation = object({
@@ -17,9 +17,9 @@ const validate = (value, links) => {
 
   try {
     scemaOfValidation.validateSync({ value });
-    return { status: STATUS.VALID, error: ERRORS.EMPTY };
+    return { error: null };
   } catch (e) {
-    return { status: STATUS.ERROR, error: e.message };
+    return { error: e.message };
   }
 };
 
