@@ -20,31 +20,25 @@ const addIDToArticles = (id, articles) => (
 );
 
 const addIDToSource = (id, source) => ({
-  id, ...source, status: true,
+  id, ...source, status: STATUS.CONNECT,
 });
 
-const addSource = ({ sources: sourcesState, articles: articlesState, form }, link) => (
+const fetchSource = ({ sources: sourcesState, articles: articlesState, form }, link) => (
   makeRequest(link)
     .then(({ data: { contents, status: { url } } }) => {
       const parsedContent = parse(contents);
-
-      if (parsedContent.error) {
-        form.status = STATUS.ERROR;
-        form.error = ERRORS.NOFEED;
-        return;
-      }
       const { source, articles } = parsedContent;
       const sourceID = uniqueId();
-      const sourcesWithID = addIDToSource(sourceID, { ...source, link: url });
+      const sourceWithID = addIDToSource(sourceID, { ...source, link: url });
       const articlesWithID = addIDToArticles(sourceID, articles);
-      sourcesState.push(sourcesWithID);
+      sourcesState.push(sourceWithID);
       articlesState.push(...articlesWithID);
       form.status = STATUS.ADDED;
       form.error = null;
     })
-    .catch(() => {
+    .catch((e) => {
       form.status = STATUS.ERROR;
-      form.error = ERRORS.NETWORK;
+      form.error = e.name === 'TypeError' ? ERRORS.NOFEED : ERRORS.NETWORK;
     })
 );
 
@@ -56,7 +50,7 @@ const updateSources = (state) => {
   return Promise.allSettled(requests)
     .then((responses) => (
       responses.forEach(({ value: { data: { contents } }, status }, index) => {
-        sources[index].status = status === 'fulfilled';
+        sources[index].status = status === 'fulfilled' ? STATUS.CONNECT : STATUS.NO_CONNECT;
         const { articles } = parse(contents);
         const newArticles = getNewArticles(articles, stateArticles);
 
@@ -67,9 +61,9 @@ const updateSources = (state) => {
         stateArticles.push(...articlesWithID);
       })
     ))
-    .catch(() => {
+    .catch((e) => {
       form.status = STATUS.ERROR;
-      form.error = ERRORS.NETWORK;
+      form.error = e.name === 'TypeError' ? ERRORS.NOFEED : ERRORS.NETWORK;
     })
     .finally(() => {
       setTimeout(updateSources, PERIOD_REQUEST, state);
@@ -95,7 +89,7 @@ const initControllers = (state) => {
 
     state.form.status = STATUS.WAIT;
     state.form.error = null;
-    addSource(state, link);
+    fetchSource(state, link);
   };
 
   document.querySelector('#rssChannel input')
@@ -112,8 +106,16 @@ const app = () => {
     })
     .finally(() => {
       const state = initializeState();
+      const elements = ({
+        inputElement: document.querySelector('#input-source'),
+        buttonElement: document.querySelector('#submit-source'),
+        messageElement: document.querySelector('#message-source'),
+        sourcesElement: document.querySelector('#sources'),
+        articlesElement: document.querySelector('#articles'),
+        templateElement: document.querySelector('#template-list').content.firstElementChild,
+      });
       initControllers(state);
-      watch(state);
+      watch(state, elements);
       updateSources(state);
     });
 };

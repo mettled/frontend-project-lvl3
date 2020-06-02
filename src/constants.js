@@ -4,6 +4,8 @@ const STATUS = {
   WAIT: 'wait',
   ADDED: 'added',
   ERROR: 'errors',
+  CONNECT: 'connect',
+  NO_CONNECT: 'noConnect',
 };
 
 const ERRORS = {
