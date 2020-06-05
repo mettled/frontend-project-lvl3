@@ -11,7 +11,7 @@ export const renderForm = ({
   messageElement,
   buttonElement,
 }) => {
-  const renderElement = (text, statusBtn = false, classAddMsg = null, classAddInput = null) => {
+  const renderElement = (text, statusBtn = false, classAddMsg, classAddInput) => {
     messageElement.innerHTML = i18next.t(`${text}`);
     buttonElement.disabled = statusBtn;
     inputElement.classList.value = classNames(['form-control', classAddInput]);
@@ -48,7 +48,7 @@ export const renderSources = ({ sources }, { sourcesElement, templateElement }) 
       li.classList.add('list-group-item-danger');
     }
     const a = templateLiElement.firstElementChild;
-    a.innerHTML = description || link;
+    a.textContent = description || link;
     a.href = link;
     li.append(a);
     return li;
@@ -62,7 +62,7 @@ export const renderArticles = ({ articles }, { articlesElement, templateElement 
     const templateLiElement = templateElement.cloneNode(true);
     const li = templateLiElement;
     const a = templateLiElement.firstElementChild;
-    a.innerHTML = description || link;
+    a.textContent = description || link;
     a.href = link;
     li.append(a);
     return li;

@@ -9,29 +9,26 @@ import parse from './parse';
 import makeRequest from './requests/makeRequest';
 import { STATUS, ERRORS } from './constants';
 
-const getNewArticles = (articles, storage) => (
-  articles.filter(({ link }) => !storage.find(({ link: storageLink }) => link === storageLink))
-);
-
 const addIDToArticles = (id, articles) => (
   articles.map(({ title, description, link }) => ({
     sourceId: id, title, description, link,
   }))
 );
 
-const addIDToSource = (id, source) => ({
-  id, ...source, status: STATUS.CONNECT,
-});
-
-const fetchSource = ({ sources: sourcesState, articles: articlesState, form }, link) => (
+const fetchSource = ({ sources, articles: articlesState, form }, link) => (
   makeRequest(link)
     .then(({ data: { contents, status: { url } } }) => {
       const parsedContent = parse(contents);
       const { source, articles } = parsedContent;
       const sourceID = uniqueId();
-      const sourceWithID = addIDToSource(sourceID, { ...source, link: url });
+      const sourceWithID = {
+        sourceID,
+        ...source,
+        link: url,
+        status: STATUS.CONNECT,
+      };
       const articlesWithID = addIDToArticles(sourceID, articles);
-      sourcesState.push(sourceWithID);
+      sources.push(sourceWithID);
       articlesState.push(...articlesWithID);
       form.status = STATUS.ADDED;
       form.error = null;
@@ -51,8 +48,16 @@ const updateSources = (state) => {
     .then((responses) => (
       responses.forEach(({ value: { data: { contents } }, status }, index) => {
         sources[index].status = status === 'fulfilled' ? STATUS.CONNECT : STATUS.NO_CONNECT;
-        const { articles } = parse(contents);
-        const newArticles = getNewArticles(articles, stateArticles);
+        let articles;
+        try {
+          articles = parse(contents);
+        } catch (e) {
+          form.status = STATUS.ERROR;
+          form.error = ERRORS.NOFEED;
+        }
+        const newArticles = articles.filter(({ link }) => (
+          !stateArticles.find(({ link: storageLink }) => link === storageLink)
+        ));
 
         if (newArticles.length === 0) {
           return;
@@ -61,9 +66,9 @@ const updateSources = (state) => {
         stateArticles.push(...articlesWithID);
       })
     ))
-    .catch((e) => {
+    .catch(() => {
       form.status = STATUS.ERROR;
-      form.error = e.name === 'TypeError' ? ERRORS.NOFEED : ERRORS.NETWORK;
+      form.error = ERRORS.NETWORK;
     })
     .finally(() => {
       setTimeout(updateSources, PERIOD_REQUEST, state);
