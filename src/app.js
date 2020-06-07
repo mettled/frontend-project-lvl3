@@ -18,7 +18,14 @@ const addIDToArticles = (id, articles) => (
 const fetchSource = ({ sources, articles: articlesState, form }, link) => (
   makeRequest(link)
     .then(({ data: { contents, status: { url } } }) => {
-      const parsedContent = parse(contents);
+      let parsedContent;
+      try {
+        parsedContent = parse(contents);
+      } catch (e) {
+        form.status = STATUS.ERROR;
+        form.error = ERRORS.NOFEED;
+        return;
+      }
       const { source, articles } = parsedContent;
       const sourceID = uniqueId();
       const sourceWithID = {
@@ -33,9 +40,9 @@ const fetchSource = ({ sources, articles: articlesState, form }, link) => (
       form.status = STATUS.ADDED;
       form.error = null;
     })
-    .catch((e) => {
+    .catch(() => {
       form.status = STATUS.ERROR;
-      form.error = e.name === 'TypeError' ? ERRORS.NOFEED : ERRORS.NETWORK;
+      form.error = ERRORS.NETWORK;
     })
 );
 
@@ -48,13 +55,15 @@ const updateSources = (state) => {
     .then((responses) => (
       responses.forEach(({ value: { data: { contents } }, status }, index) => {
         sources[index].status = status === 'fulfilled' ? STATUS.CONNECT : STATUS.NO_CONNECT;
-        let articles;
+        let parsedContent;
         try {
-          articles = parse(contents);
+          parsedContent = parse(contents);
         } catch (e) {
           form.status = STATUS.ERROR;
           form.error = ERRORS.NOFEED;
+          return;
         }
+        const { articles } = parsedContent;
         const newArticles = articles.filter(({ link }) => (
           !stateArticles.find(({ link: storageLink }) => link === storageLink)
         ));
