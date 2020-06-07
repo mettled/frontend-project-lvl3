@@ -55,15 +55,14 @@ const updateSources = (state) => {
     .then((responses) => (
       responses.forEach(({ value: { data: { contents } }, status }, index) => {
         sources[index].status = status === 'fulfilled' ? STATUS.CONNECT : STATUS.NO_CONNECT;
-        let parsedContent;
+        let articles;
         try {
-          parsedContent = parse(contents);
+          articles = parse(contents).articles;
         } catch (e) {
           form.status = STATUS.ERROR;
           form.error = ERRORS.NOFEED;
           return;
         }
-        const { articles } = parsedContent;
         const newArticles = articles.filter(({ link }) => (
           !stateArticles.find(({ link: storageLink }) => link === storageLink)
         ));
