@@ -1,13 +1,13 @@
 /*  eslint no-param-reassign: 0 */
 
-import { uniqueId } from 'lodash';
+import { uniqueId, differenceWith } from 'lodash';
 import watch from './watch';
 import initLocalization from './localization';
 import validate from './validate';
 import initializeState from './initializeState';
 import parse from './parse';
-import makeRequest from './requests/makeRequest';
-import { STATUS, ERRORS } from './constants';
+import makeRequest from './makeRequest';
+import { statuses, errors } from './constants';
 
 const addIDToArticles = (id, articles) => (
   articles.map(({ title, description, link }) => ({
@@ -22,8 +22,8 @@ const fetchSource = ({ sources, articles: articlesState, form }, link) => (
       try {
         parsedContent = parse(contents);
       } catch (e) {
-        form.status = STATUS.ERROR;
-        form.error = ERRORS.NOFEED;
+        form.status = statuses.ERROR;
+        form.error = errors.NO_FEED;
         return;
       }
       const { source, articles } = parsedContent;
@@ -32,17 +32,17 @@ const fetchSource = ({ sources, articles: articlesState, form }, link) => (
         sourceID,
         ...source,
         link: url,
-        status: STATUS.CONNECT,
+        status: statuses.CONNECT,
       };
       const articlesWithID = addIDToArticles(sourceID, articles);
       sources.push(sourceWithID);
       articlesState.push(...articlesWithID);
-      form.status = STATUS.ADDED;
+      form.status = statuses.ADDED;
       form.error = null;
     })
     .catch(() => {
-      form.status = STATUS.ERROR;
-      form.error = ERRORS.NETWORK;
+      form.status = statuses.ERROR;
+      form.error = errors.NETWORK;
     })
 );
 
@@ -54,18 +54,22 @@ const updateSources = (state) => {
   return Promise.allSettled(requests)
     .then((responses) => (
       responses.forEach(({ value: { data: { contents } }, status }, index) => {
-        sources[index].status = status === 'fulfilled' ? STATUS.CONNECT : STATUS.NO_CONNECT;
+        sources[index].status = statuses.CONNECT;
+        if (status === 'rejected') {
+          sources[index].status = statuses.NO_CONNECT;
+          return;
+        }
         let articles;
         try {
           articles = parse(contents).articles;
         } catch (e) {
-          form.status = STATUS.ERROR;
-          form.error = ERRORS.NOFEED;
+          sources[index].status = errors.NO_FEED;
           return;
         }
-        const newArticles = articles.filter(({ link }) => (
-          !stateArticles.find(({ link: storageLink }) => link === storageLink)
-        ));
+
+        const newArticles = differenceWith(articles,
+          stateArticles,
+          ({ link: link1 }, { link: link2 }) => link1 === link2);
 
         if (newArticles.length === 0) {
           return;
@@ -75,23 +79,23 @@ const updateSources = (state) => {
       })
     ))
     .catch(() => {
-      form.status = STATUS.ERROR;
-      form.error = ERRORS.NETWORK;
+      form.status = statuses.ERROR;
+      form.error = errors.NETWORK;
     })
     .finally(() => {
       setTimeout(updateSources, PERIOD_REQUEST, state);
     });
 };
 
-const initControllers = (state) => {
+const handlers = (state) => {
   const onInput = ({ target: { value } }) => {
     state.form.error = null;
     if (value.length === 0) {
-      state.form.status = STATUS.EMPTY;
+      state.form.status = statuses.EMPTY;
       return;
     }
-    const { error } = validate(value, state.sources);
-    state.form.status = error ? STATUS.ERROR : STATUS.VALID;
+    const error = validate(value, state.sources);
+    state.form.status = error ? statuses.ERROR : statuses.VALID;
     state.form.error = error;
   };
 
@@ -100,7 +104,7 @@ const initControllers = (state) => {
     const form = new FormData(e.target);
     const link = form.get('url');
 
-    state.form.status = STATUS.WAIT;
+    state.form.status = statuses.WAIT;
     state.form.error = null;
     fetchSource(state, link);
   };
@@ -114,10 +118,7 @@ const initControllers = (state) => {
 
 const app = () => {
   initLocalization()
-    .catch(() => {
-      console.log('Something went wrong during initialization');
-    })
-    .finally(() => {
+    .then(() => {
       const state = initializeState();
       const elements = ({
         inputElement: document.querySelector('#input-source'),
@@ -127,9 +128,12 @@ const app = () => {
         articlesElement: document.querySelector('#articles'),
         templateElement: document.querySelector('#template-list').content.firstElementChild,
       });
-      initControllers(state);
+      handlers(state);
       watch(state, elements);
       updateSources(state);
+    })
+    .catch(() => {
+      console.log('Something went wrong during initialization');
     });
 };
 

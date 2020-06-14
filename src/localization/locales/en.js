@@ -1,20 +1,18 @@
-import { STATUS, ERRORS } from '../../constants';
-
 export default {
   translation: {
     errors: {
-      [ERRORS.EMPTY]: '',
-      [ERRORS.NETWORK]: 'Check network connection',
-      [ERRORS.INCORRECT]: 'Please enter correct link',
-      [ERRORS.DUBLICATE]: 'Please enter another link, it was already added',
-      [ERRORS.NOFEED]: 'Link doesnt contain RSS-feed',
+      empty: '',
+      network: 'Check network connection',
+      incorrect: 'Please enter correct link',
+      dublicate: 'Please enter another link, it was already added',
+      noFeed: 'Link doesnt contain RSS-feed',
     },
-    status: {
-      [STATUS.EMPTY]: 'Please add RSS channel',
-      [STATUS.VALID]: 'Channel is valid',
-      [STATUS.WAIT]: 'Waiting....',
-      [STATUS.ADDED]: 'Channel was added',
-      [STATUS.ERROR]: '',
+    statuses: {
+      empty: 'Please add RSS channel',
+      valid: 'Channel is valid',
+      wait: 'Waiting....',
+      added: 'Channel was added',
+      error: '',
     },
   },
 };

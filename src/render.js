@@ -2,7 +2,7 @@
 
 import i18next from 'i18next';
 import classNames from 'classnames';
-import { STATUS } from './constants';
+import { statuses, errors } from './constants';
 
 export const renderForm = ({
   form: { status, error },
@@ -19,20 +19,20 @@ export const renderForm = ({
   };
 
   switch (status) {
-    case STATUS.ERROR:
+    case statuses.ERROR:
       renderElement(`errors.${error}`, true, 'text-danger', 'is-invalid');
       break;
-    case STATUS.EMPTY:
-      renderElement(`status.${status}`, true, 'text-muted');
+    case statuses.EMPTY:
+      renderElement('statuses.empty', true, 'text-muted');
       break;
-    case STATUS.WAIT:
-      renderElement(`status.${status}`, true, 'text-muted', 'is-valid');
+    case statuses.WAIT:
+      renderElement('statuses.wait', true, 'text-muted', 'is-valid');
       break;
-    case STATUS.VALID:
-      renderElement(`status.${status}`, false, 'text-success', 'is-valid');
+    case statuses.VALID:
+      renderElement('statuses.valid', false, 'text-success', 'is-valid');
       break;
-    case STATUS.ADDED:
-      renderElement(`status.${status}`, true, 'text-muted');
+    case statuses.ADDED:
+      renderElement('statuses.added', true, 'text-muted');
       inputElement.value = '';
       break;
     default:
@@ -44,9 +44,13 @@ export const renderSources = ({ sources }, { sourcesElement, templateElement }) 
   const nodes = sources.map(({ description, link, status }) => {
     const templateLiElement = templateElement.cloneNode(true);
     const li = templateLiElement;
-    if (status === STATUS.NO_CONNECT) {
-      li.classList.add('list-group-item-danger');
-    }
+
+    li.classList.value = classNames({
+      'list-group-item': true,
+      'list-group-item-danger': status === statuses.NO_CONNECT,
+      'list-group-item-warning': status === errors.NO_FEED,
+    });
+
     const a = templateLiElement.firstElementChild;
     a.textContent = description || link;
     a.href = link;

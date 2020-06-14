@@ -1,4 +1,4 @@
-const STATUS = {
+const statuses = {
   EMPTY: 'empty',
   VALID: 'valid',
   WAIT: 'wait',
@@ -8,11 +8,11 @@ const STATUS = {
   NO_CONNECT: 'noConnect',
 };
 
-const ERRORS = {
-  NETWORK: 'networkError',
-  INCORRECT: 'incorrectLink',
-  DUBLICATE: 'dublicateLink',
-  NOFEED: 'noFeed',
+const errors = {
+  NETWORK: 'network',
+  INCORRECT: 'incorrect',
+  DUBLICATE: 'dublicate',
+  NO_FEED: 'noFeed',
 };
 
-export { STATUS, ERRORS };
+export { statuses, errors };

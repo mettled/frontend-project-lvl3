@@ -11,7 +11,7 @@ const parse = (content) => {
     description: parsedData.querySelector('description').textContent,
   };
 
-  const items = parsedData.querySelectorAll('item') || [];
+  const items = parsedData.querySelectorAll('item');
   const articles = [...items].map(parseArticle);
   return { source, articles };
 };
