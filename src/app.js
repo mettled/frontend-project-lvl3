@@ -48,7 +48,7 @@ const fetchSource = ({ sources, articles: articlesState, form }, link) => (
 
 const updateSources = (state) => {
   const PERIOD_REQUEST = 5000;
-  const { sources, articles: stateArticles, form } = state;
+  const { sources, articles: stateArticles } = state;
   const requests = sources.map(({ link }) => makeRequest(link));
   const sourcesID = sources.map(({ id }) => id);
   return Promise.allSettled(requests)
@@ -78,16 +78,15 @@ const updateSources = (state) => {
         stateArticles.push(...articlesWithID);
       })
     ))
-    .catch(() => {
-      form.status = statuses.ERROR;
-      form.error = errors.NETWORK;
+    .catch((e) => {
+      console.log(e.message);
     })
     .finally(() => {
       setTimeout(updateSources, PERIOD_REQUEST, state);
     });
 };
 
-const handlers = (state) => {
+const createHandlers = (state) => {
   const onInput = ({ target: { value } }) => {
     state.form.error = null;
     if (value.length === 0) {
@@ -128,7 +127,7 @@ const app = () => {
         articlesElement: document.querySelector('#articles'),
         templateElement: document.querySelector('#template-list').content.firstElementChild,
       });
-      handlers(state);
+      createHandlers(state);
       watch(state, elements);
       updateSources(state);
     })
