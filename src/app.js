@@ -86,7 +86,7 @@ const updateSources = (state) => {
     });
 };
 
-const createHandlers = (state) => {
+const initHandlers = (state) => {
   const onInput = ({ target: { value } }) => {
     state.form.error = null;
     if (value.length === 0) {
@@ -127,7 +127,7 @@ const app = () => {
         articlesElement: document.querySelector('#articles'),
         templateElement: document.querySelector('#template-list').content.firstElementChild,
       });
-      createHandlers(state);
+      initHandlers(state);
       watch(state, elements);
       updateSources(state);
     })
